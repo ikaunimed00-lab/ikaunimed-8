@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* Scan files - Tetap sama */
+@source '../js/**/*.tsx'; 
+@source '../js/**/*.jsx'; 
+@source '../js/**/*.js';
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    /* ... Definisi warna tetap sama sesuai file asli Anda ... */
+    --color-background: #FFFFFF;
+    --color-foreground: #111827;
+    --color-primary: #FF7E00;
+    --color-primary-foreground: #FFFFFF;
+    --color-card: #FFFFFF;
+    --color-card-foreground: #111827;
+    --color-muted: #F3F4F6;
+    --color-muted-foreground: #6B7280;
+    --color-accent: #E5E7EB;
+    --color-accent-foreground: #111827;
+    --color-border: #E5E7EB;
+    --color-input: #E5E7EB;
+    --color-ring: #FF7E00;
+    --radius-lg: 0.625rem;
+    --color-oxygen-orange: #FF7E00;
+    --color-oxygen-teal: #00A69D;
+    --color-oxygen-green: #37D67A;
+    --color-oxygen-blue: #007BFF;
+    --color-oxygen-purple: #8B5CF6;
+    --color-orange-50: #FFF7ED;
+    --color-amber-50: #FFFBEB;
+    --color-teal-50: #ECFAF8;
+    --color-cyan-50: #ECFEFF;
+    --color-blue-50: #EFF6FF;
+    --color-gray-600: #4B5563;
+    --color-first-dark-green: #085a18;
+    --color-second-dark-green: #0f7525;
+    --color-light-green: #dbe9d8;
+    --color-ika-yellow: #e9cf35;
+}
+
+:root {
+    --background: #FFFFFF;
+    --foreground: #111827;
+    --primary: #FF7E00;
+    --primary-foreground: #FFFFFF;
+    --oxygen-teal: #00A69D;
+}
+
+.dark {
+    --background: #111827;
+    --foreground: #FFFFFF;
+    --primary: #FF7E00;
+    --primary-foreground: #FFFFFF;
+}
+
+@layer components {
+    /* PERBAIKAN: Menyeimbangkan lebar agar tidak terlalu sempit & tidak terlalu rapat */
+    .container, 
+    .max-w-7xl {
+        @apply mx-auto px-4 md:px-6 lg:px-8; /* Memberikan jarak aman di kiri-kanan */
+        width: 100% !important;
+        max-width: 1536px !important; /* Diperlebar dari 1280px ke 1536px (2xl) */
+    }
+
+    .text-gradient-orange {
+        background: linear-gradient(to bottom right, #FF7E00, #FFB800);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        background-color: #FFFFFF;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+    }
+}

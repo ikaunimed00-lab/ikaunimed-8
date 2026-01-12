@@ -1,0 +1,118 @@
+import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from "lucide-react";
+
+const Footer = () => {
+  const links = {
+    layanan: ["Direktori Alumni", "Info Karir", "Kemitraan", "Kartu Alumni", "E-Voting"],
+    informasi: ["FAQ", "Hubungi Kami", "Sekretariat", "Agenda Kegiatan", "Donasi"],
+    organisasi: ["Tentang IKA", "Struktur Organisasi", "Berita", "Syarat & Ketentuan", "Kebijakan Privasi"],
+  };
+
+  const socialLinks = [
+    { icon: Facebook, href: "#", label: "Facebook" },
+    { icon: Instagram, href: "#", label: "Instagram" },
+    { icon: Twitter, href: "#", label: "Twitter" },
+    { icon: Youtube, href: "#", label: "Youtube" },
+  ];
+
+  return (
+    <footer className="bg-[#0F172A] text-white pt-16 pb-8 border-t-2 border-[#FFD700]/20">
+      <div className="container">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+          
+          {/* Logo & Description Section */}
+          <div className="lg:col-span-2">
+            <div className="mb-6 flex items-center gap-3">
+              <img 
+                src="/images/favicon_ikaunimed.png" 
+                alt="Logo IKA UNIMED" 
+                className="h-10 w-auto" 
+              />
+              <div className="flex flex-col leading-none">
+                <div className="text-2xl font-bold tracking-tighter">
+                  <span className="text-primary">IKA</span>
+                  <span className="text-oxygen-teal">UNI</span>
+                  <span style={{ color: '#FFD700' }}>MED</span>
+                </div>
+                <span className="text-[8px] text-gray-400 mt-1 uppercase tracking-widest font-medium">
+                  Connect, Collaborate, Contribute
+                </span>
+              </div>
+            </div>
+            
+            <p className="text-gray-400 mb-8 max-w-sm text-sm leading-relaxed">
+              Wadah resmi kolaborasi alumni Universitas Negeri Medan untuk membangun jejaring profesional dan kontribusi bagi almamater.
+            </p>
+            
+            {/* Info Kontak dengan Aksen Emas & Teal */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 group">
+                <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-oxygen-teal transition-all">
+                  <MapPin className="w-4 h-4 text-oxygen-teal" />
+                </div>
+                <span className="text-gray-300 text-sm">Medan, Indonesia</span>
+              </div>
+              <div className="flex items-center gap-4 group">
+                <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-[#FFD700] transition-all">
+                  <Phone className="w-4 h-4 text-[#FFD700]" />
+                </div>
+                <span className="text-gray-300 text-sm">+62 815 3238 7608</span>
+              </div>
+              <div className="flex items-center gap-4 group">
+                <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary transition-all">
+                  <Mail className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-gray-300 text-sm">office@ikaunimed.or.id</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Kolom Link Navigasi */}
+          {Object.keys(links).map((category) => (
+            <div key={category}>
+              <h4 className="font-bold mb-6 text-white text-sm uppercase tracking-widest relative inline-block">
+                {category}
+                <span className="absolute -bottom-1 left-0 w-1/2 h-0.5 bg-[#FFD700]"></span>
+              </h4>
+              <ul className="space-y-3">
+                {links[category as keyof typeof links].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-gray-400 hover:text-oxygen-teal transition-all flex items-center gap-2 group text-sm">
+                      <span className="h-px w-0 bg-oxygen-teal group-hover:w-3 transition-all"></span>
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Bar: Social & Copyright */}
+        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            {socialLinks.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center hover:bg-oxygen-teal transition-all duration-500 group"
+              >
+                <social.icon className="w-5 h-5 text-gray-400 group-hover:text-white" />
+              </a>
+            ))}
+          </div>
+          
+          <div className="text-right">
+            <p className="text-gray-500 text-xs tracking-wide">
+              © 2026 <span className="text-oxygen-teal font-semibold">IKA</span>
+              <span className="text-white">UNI</span>
+              <span style={{ color: '#FFD700' }} className="font-semibold">MED</span>.
+            </p>
+            <p className="text-[10px] text-gray-600 uppercase mt-1">Sumatera Utara, Indonesia</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
