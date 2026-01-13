@@ -1,0 +1,30 @@
+name: Deploy Laravel
+on:
+  push:
+    branches: [ main ] # Jalankan otomatis saat push ke branch main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # 1. Proses Build Aset (npm run build) di Server GitHub
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npm run build
+
+      # 2. Kirim Kode & Jalankan Perintah di Hosting via SSH
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/elawepco/repositories/ikaunimed-8
+            git pull origin main
+            php artisan optimize:clear
