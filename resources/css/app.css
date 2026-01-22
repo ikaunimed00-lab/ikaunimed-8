@@ -16,7 +16,7 @@
     /* ... Definisi warna tetap sama sesuai file asli Anda ... */
     --color-background: #FFFFFF;
     --color-foreground: #111827;
-    --color-primary: #FF7E00;
+    --color-primary: #0F766E;
     --color-primary-foreground: #FFFFFF;
     --color-card: #FFFFFF;
     --color-card-foreground: #111827;
@@ -26,10 +26,10 @@
     --color-accent-foreground: #111827;
     --color-border: #E5E7EB;
     --color-input: #E5E7EB;
-    --color-ring: #FF7E00;
+    --color-ring: #0F766E;
     --radius-lg: 0.625rem;
-    --color-oxygen-orange: #FF7E00;
-    --color-oxygen-teal: #00A69D;
+    --color-oxygen-orange: #0F766E;
+    --color-oxygen-teal: #0F766E;
     --color-oxygen-green: #37D67A;
     --color-oxygen-blue: #007BFF;
     --color-oxygen-purple: #8B5CF6;
@@ -48,15 +48,15 @@
 :root {
     --background: #FFFFFF;
     --foreground: #111827;
-    --primary: #FF7E00;
+    --primary: #0F766E;
     --primary-foreground: #FFFFFF;
-    --oxygen-teal: #00A69D;
+    --oxygen-teal: #0F766E;
 }
 
 .dark {
     --background: #111827;
     --foreground: #FFFFFF;
-    --primary: #FF7E00;
+    --primary: #0F766E;
     --primary-foreground: #FFFFFF;
 }
 
@@ -70,7 +70,7 @@
     }
 
     .text-gradient-orange {
-        background: linear-gradient(to bottom right, #FF7E00, #FFB800);
+        background: linear-gradient(to bottom right, #0F766E, #115E59);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -90,4 +90,16 @@
         margin: 0;
         padding: 0;
     }
+}
+.rte-btn {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.rte-btn:hover {
+  background: #e5e7eb;
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { route } from "ziggy-js";
 
 const PackageSection = () => {
   const ctaData = [
@@ -8,16 +9,16 @@ const PackageSection = () => {
       description: "Tingkatkan kompetensi dengan materi ringkas dari seluruh program studi UNIMED. Pelajari keahlian baru kapan dan dimana saja. Daftar sekarang dan mulailah bertumbuh.",
       bgImage: "/images/cta_ikaunimed-01.png",
       tagline: "Keterampilan Siap Pakai",
-      href: "/paket/stream-plus",
+      href: route('categories.show', 'skill'),
       position: "right",
     },
     {
       id: "ikaunimed-cta-2",
       title: "Donasi & Beasiswa Alumni",
       description: "Program Donasi & Beasiswa dari Ikatan Alumni kini kembali dibuka. Jangan biarkan kendala biaya menghalangi prestasimu. Segera cek persyaratan dan daftar melalui Portal Mahasiswa Bakat Unimed.",
-      bgImage: "/images/cta_ikaunimed-02.png",
+      bgImage: "/images/cta_ikaunimed-002.png",
       tagline: "Wujudkan Mimpimu Sekarang!",
-      href: "/paket/alumni-connect",
+      href: route('categories.show', 'beasiswa'),
       position: "left",
     },
     {
@@ -26,7 +27,7 @@ const PackageSection = () => {
       description: "Temukan lowongan kerja eksklusif dari mitra perusahaan terpercaya. Kami menjembatani lulusan UNIMED dengan industri untuk membangun karir yang gemilang. Akses portal karir sekarang juga.",
       bgImage: "/images/cta_ikaunimed-03.png",
       tagline: "Karir Masa Depan",
-      href: "/paket/career-center",
+      href: route('categories.show', 'karier'),
       position: "right",
     },
     {
@@ -35,7 +36,7 @@ const PackageSection = () => {
       description: "Update data diri Anda sekarang dan nikmati kemudahan akses legalisir dokumen secara online hanya dalam beberapa klik.",
       bgImage: "/images/cta_ikaunimed-04.png",
       tagline: "Daftar & Ajukan Sekarang!",
-      href: "/paket/alumni-connect",
+      href: route('legalization.create'),
       position: "left",
     }
   ];

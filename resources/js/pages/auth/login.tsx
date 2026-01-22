@@ -10,6 +10,7 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
+import { Chrome } from 'lucide-react';
 
 interface LoginProps {
     status?: string;
@@ -36,6 +37,22 @@ export default function Login({
             >
                 {({ processing, errors }) => (
                     <>
+                        <div className="grid gap-3">
+                            <a 
+                                href="/auth/google"
+                                className="w-full h-11 px-4 py-2 border border-slate-300 rounded-lg font-semibold text-sm text-slate-700 hover:bg-slate-50 transition-all flex items-center justify-center gap-2 group hover:border-blue-400"
+                            >
+                                <Chrome className="h-4 w-4 text-blue-600 group-hover:scale-110 transition-transform" />
+                                <span>Login dengan Google</span>
+                            </a>
+                        </div>
+
+                        <div className="flex items-center gap-3 my-2">
+                            <div className="flex-1 border-t border-slate-200"></div>
+                            <span className="text-xs text-slate-500 font-medium">ATAU</span>
+                            <div className="flex-1 border-t border-slate-200"></div>
+                        </div>
+
                         <div className="grid gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>

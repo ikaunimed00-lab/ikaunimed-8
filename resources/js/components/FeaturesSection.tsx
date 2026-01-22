@@ -1,13 +1,14 @@
 import { Users, Briefcase, Newspaper, GraduationCap, CreditCard, HeartHandshake } from "lucide-react";
+import { Link } from "@inertiajs/react";
 
 const FeaturesSection = () => {
   const features = [
-    { icon: Users, title: "Database Alumni", description: "Terhubung kembali dengan rekan sejawat", color: "text-primary", bg: "bg-primary/10", border: "bg-primary" },
-    { icon: Briefcase, title: "Info Karir", description: "Loker & peluang bisnis alumni", color: "text-oxygen-teal", bg: "bg-oxygen-teal/10", border: "bg-oxygen-teal" },
-    { icon: Newspaper, title: "Berita Kampus", description: "Update terkini agenda UNIMED", color: "text-[#FFD700]", bg: "bg-[#FFD700]/10", border: "bg-[#FFD700]" },
-    { icon: GraduationCap, title: "Program Beasiswa", description: "Bantuan pendidikan mahasiswa", color: "text-primary", bg: "bg-primary/10", border: "bg-primary" },
-    { icon: CreditCard, title: "Kartu Alumni", description: "Akses identitas digital khusus", color: "text-oxygen-teal", bg: "bg-oxygen-teal/10", border: "bg-oxygen-teal" },
-    { icon: HeartHandshake, title: "Ruang Pengabdian", description: "Kontribusi nyata bagi almamater", color: "text-[#FFD700]", bg: "bg-[#FFD700]/10", border: "bg-[#FFD700]" },
+    { icon: Users, title: "Database Alumni", description: "Terhubung kembali dengan rekan sejawat", color: "text-primary", bg: "bg-primary/10", border: "bg-primary", href: "/database" },
+    { icon: Briefcase, title: "Info Karir", description: "Loker & peluang bisnis alumni", color: "text-oxygen-teal", bg: "bg-oxygen-teal/10", border: "bg-oxygen-teal", href: "/karir" },
+    { icon: Newspaper, title: "Berita Kampus", description: "Update terkini agenda UNIMED", color: "text-[#FFD700]", bg: "bg-[#FFD700]/10", border: "bg-[#FFD700]", href: "/news" },
+    { icon: GraduationCap, title: "Program Beasiswa", description: "Bantuan pendidikan mahasiswa", color: "text-primary", bg: "bg-primary/10", border: "bg-primary", href: "/beasiswa" },
+    { icon: CreditCard, title: "Kartu Alumni", description: "Akses identitas digital khusus", color: "text-oxygen-teal", bg: "bg-oxygen-teal/10", border: "bg-oxygen-teal", href: "/kartu-alumni" },
+    { icon: HeartHandshake, title: "Ruang Pengabdian", description: "Kontribusi nyata bagi almamater", color: "text-[#FFD700]", bg: "bg-[#FFD700]/10", border: "bg-[#FFD700]", href: "/pengabdian" },
   ];
 
   return (
@@ -30,12 +31,12 @@ const FeaturesSection = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
           {features.map((feature, index) => (
-            <div
+            <Link
               key={index}
-              /* Card Utama */
-              className="bg-white border border-gray-100 rounded-2xl p-6 pb-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden"
+              href={feature.href}
+              className="bg-white border border-gray-100 rounded-2xl p-6 pb-8 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden flex flex-col items-center"
             >
-              <div className={`w-16 h-16 ${feature.bg} rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-16 h-16 ${feature.bg} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                 <feature.icon className={`w-8 h-8 ${feature.color}`} />
               </div>
               
@@ -50,7 +51,7 @@ const FeaturesSection = () => {
               {/* Garis Aksen di BAGIAN BAWAH - Muncul saat Hover */}
               <div className={`absolute bottom-0 left-0 w-full h-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 ${feature.border}`}>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

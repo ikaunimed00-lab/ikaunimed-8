@@ -15,17 +15,11 @@ use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         $this->configureActions();
@@ -33,18 +27,12 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
     }
 
-    /**
-     * Configure Fortify actions.
-     */
     private function configureActions(): void
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
     }
 
-    /**
-     * Configure Fortify views.
-     */
     private function configureViews(): void
     {
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/login', [
@@ -52,6 +40,8 @@ class FortifyServiceProvider extends ServiceProvider
             'canRegister' => Features::enabled(Features::registration()),
             'status' => $request->session()->get('status'),
         ]));
+
+        Fortify::registerView(fn () => Inertia::render('auth/register'));
 
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/reset-password', [
             'email' => $request->email,
@@ -66,26 +56,46 @@ class FortifyServiceProvider extends ServiceProvider
             'status' => $request->session()->get('status'),
         ]));
 
-        Fortify::registerView(fn () => Inertia::render('auth/register'));
-
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 
         Fortify::confirmPasswordView(fn () => Inertia::render('auth/confirm-password'));
     }
 
-    /**
-     * Configure rate limiting.
-     */
     private function configureRateLimiting(): void
     {
-        RateLimiter::for('two-factor', function (Request $request) {
-            return Limit::perMinute(5)->by($request->session()->get('login.id'));
+        RateLimiter::for('login', function (Request $request) {
+            $throttleKey = Str::lower($request->input(Fortify::username())).'|'.$request->ip();
+            return Limit::perMinute(5)->by($throttleKey);
         });
 
-        RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+        // After registration, redirect to profile completion
+        Fortify::redirects('register', function () {
+            return route('profile.edit');
+        });
 
-            return Limit::perMinute(5)->by($throttleKey);
+        // After login, redirect to profile if incomplete
+        Fortify::redirects('login', function (Request $request) {
+            if (auth()->check()) {
+                $user = auth()->user();
+                
+                // Check if profile is incomplete
+                $requiredFields = ['wa', 'nik', 'tempat_lahir', 'tanggal_lahir', 'alamat_lengkap', 
+                                   's1_fakultas', 's1_prodi', 's1_tahun_masuk', 's1_tahun_tamat'];
+                
+                foreach ($requiredFields as $field) {
+                    if (empty($user->{$field})) {
+                        return route('profile.edit');
+                    }
+                }
+                
+                // Profile complete, go to dashboard
+                if ($user->role === 'admin' || $user->role === 'editor') {
+                    return route('dashboard');
+                }
+            }
+            
+            // Default: profile edit
+            return route('profile.edit');
         });
     }
 }

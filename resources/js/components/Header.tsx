@@ -1,13 +1,20 @@
 import { useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, LayoutDashboard, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "@inertiajs/react"; // Baris yang ditambahkan
+import { Link, usePage, router } from "@inertiajs/react";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { auth } = usePage().props as any;
+  const user = auth?.user;
+
+  const handleLogout = () => {
+    router.post('/logout');
+  };
 
   const navItems = [
-    { label: "Berita", href: "/berita", hasDropdown: false }, // Contoh penyesuaian menu
+    { label: "Home", href: "/", hasDropdown: false },
+    { label: "Berita", href: "/news", hasDropdown: false },
     { label: "Agenda", href: "/agenda", hasDropdown: false },
     { label: "Bantuan", href: "/bantuan", hasDropdown: true },
   ];
@@ -53,24 +60,50 @@ const Header = () => {
 
           {/* Tombol CTA */}
           <div className="flex items-center gap-4 border-l-2 border-slate-100 pl-8">
-            {/* Tombol Daftar terhubung ke /register */}
-            <Link href="/register">
-              <Button 
-                className="bg-gradient-to-r from-oxygen-teal to-[#00C2B6] hover:to-oxygen-teal text-white text-sm px-8 py-2.5 font-extrabold rounded-full shadow-[0_4px_14px_0_rgba(0,166,157,0.39)] transition-all duration-300 transform hover:scale-105"
-              >
-                DAFTAR
-              </Button>
-            </Link>
-            
-            {/* Tombol Login terhubung ke /login */}
-            <Link href="/login">
-              <Button 
-                variant="outline" 
-                className="bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white text-sm px-8 py-2.5 font-extrabold rounded-full transition-all duration-300 shadow-sm"
-              >
-                LOGIN
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                {/* Dashboard Button */}
+                <Link href={user.role === 'subscriber' ? '/dashboard/subscriber' : user.role === 'admin' ? '/dashboard/admin' : user.role === 'editor' ? '/dashboard/editor' : '/dashboard/writer'}>
+                  <Button 
+                    className="flex items-center gap-2 bg-gradient-to-r from-oxygen-teal to-[#00C2B6] hover:to-oxygen-teal text-white text-sm px-6 py-2.5 font-extrabold rounded-full shadow-[0_4px_14px_0_rgba(0,166,157,0.39)] transition-all duration-300 transform hover:scale-105"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    DASHBOARD
+                  </Button>
+                </Link>
+                
+                {/* Logout Button */}
+                <Button 
+                  onClick={handleLogout}
+                  variant="outline" 
+                  className="flex items-center gap-2 bg-white border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white text-sm px-6 py-2.5 font-extrabold rounded-full transition-all duration-300 shadow-sm cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  LOGOUT
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Tombol Daftar */}
+                <Link href="/register">
+                  <Button 
+                    className="bg-gradient-to-r from-oxygen-teal to-[#00C2B6] hover:to-oxygen-teal text-white text-sm px-8 py-2.5 font-extrabold rounded-full shadow-[0_4px_14px_0_rgba(0,166,157,0.39)] transition-all duration-300 transform hover:scale-105"
+                  >
+                    DAFTAR
+                  </Button>
+                </Link>
+                
+                {/* Tombol Login */}
+                <Link href="/login">
+                  <Button 
+                    variant="outline" 
+                    className="bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white text-sm px-8 py-2.5 font-extrabold rounded-full transition-all duration-300 shadow-sm"
+                  >
+                    LOGIN
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -96,12 +129,32 @@ const Header = () => {
               </Link>
             ))}
             <div className="flex flex-col gap-4 pt-10">
-              <Link href="/register">
-                <Button className="w-full bg-gradient-to-r from-oxygen-teal to-[#00C2B6] text-white py-7 font-extrabold rounded-2xl">DAFTAR SEKARANG</Button>
-              </Link>
-              <Link href="/login">
-                <Button variant="outline" className="w-full border-2 border-primary text-primary py-7 font-extrabold rounded-2xl bg-white">LOGIN PORTAL</Button>
-              </Link>
+              {user ? (
+                <>
+                  <Link href={user.role === 'subscriber' ? '/dashboard/subscriber' : user.role === 'admin' ? '/dashboard/admin' : user.role === 'editor' ? '/dashboard/editor' : '/dashboard/writer'}>
+                    <Button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-oxygen-teal to-[#00C2B6] text-white py-7 font-extrabold rounded-2xl">
+                      <LayoutDashboard className="w-5 h-5" />
+                      DASHBOARD
+                    </Button>
+                  </Link>
+                  <Button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 bg-red-500 text-white py-7 font-extrabold rounded-2xl hover:bg-red-600 cursor-pointer"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    LOGOUT
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/register">
+                    <Button className="w-full bg-gradient-to-r from-oxygen-teal to-[#00C2B6] text-white py-7 font-extrabold rounded-2xl">DAFTAR SEKARANG</Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button variant="outline" className="w-full border-2 border-primary text-primary py-7 font-extrabold rounded-2xl bg-white">LOGIN PORTAL</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>

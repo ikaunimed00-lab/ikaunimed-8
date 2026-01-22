@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateNewsRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        $user = auth()->user();
+        $news = $this->route('news');
+
+        return $user->isWriter() && (
+            $user->isAdmin() ||
+            $user->isEditor() ||
+            ($user->isWriter() && $news->user_id === $user->id)
+        );
+    }
+
+    public function rules(): array
+    {
+        $newsId = $this->route('news')->id;
+
+        return [
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                'min:10',
+                "unique:news,title,{$newsId}",
+                // Allow common characters including hyphen, ampersand, etc
+                'regex:/^[\p{L}\p{N}\s\-\.\,\:\;\(\)\'\"&\/?]+$/u',
+            ],
+            'excerpt' => [
+                'required',
+                'string',
+                'min:20',
+                'max:500',
+            ],
+            'content' => [
+                'required',
+                'string',
+                'min:100',
+                'max:50000',
+            ],
+            'image' => [
+                'nullable',
+                'image',
+                'max:5120',
+                'dimensions:min_width=600,min_height=400,ratio=3/2',
+            ],
+            'categories' => [
+                'required',
+                'array',
+                'min:1',
+                'max:3',
+            ],
+            'categories.*' => 'required|integer|exists:categories,id',
+            'published_at' => 'nullable|date_format:Y-m-d\TH:i',
+            'status' => 'required|in:draft,scheduled,published',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'Judul berita wajib diisi',
+            'title.min' => 'Judul minimal 10 karakter',
+            'title.unique' => 'Judul sudah pernah digunakan',
+            'excerpt.required' => 'Ringkasan wajib diisi',
+            'excerpt.min' => 'Ringkasan minimal 20 karakter',
+            'content.min' => 'Konten minimal 100 karakter untuk kualitas terbaik',
+            'image.dimensions' => 'Rasio foto harus 3:2 (contoh: 1200x800px)',
+            'categories.required' => 'Pilih minimal 1 kategori',
+            'categories.max' => 'Maksimal 3 kategori',
+        ];
+    }
+}

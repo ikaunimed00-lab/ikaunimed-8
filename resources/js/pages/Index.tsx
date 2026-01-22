@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { Head } from "@inertiajs/react";
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -13,13 +13,14 @@ import FloatingCTA from "@/components/FloatingCTA";
 const Index = () => {
   return (
     <>
-      <Helmet>
-        {/* Update Judul di sini */}
+      <Head>
+        {/* Menggunakan Head dari Inertia untuk SEO yang stabil di React 19 */}
         <title>IKA UNIMED - Connect, Collaborate, Contribute</title>
         <meta name="description" content="Official Website Ikatan Alumni Universitas Negeri Medan (IKA UNIMED)" />
-      </Helmet>
+        <meta property="og:title" content="IKA UNIMED" />
+        <meta property="og:description" content="Official Website Ikatan Alumni Universitas Negeri Medan" />
+      </Head>
       
-      {/* Pastikan tidak ada 'overflow-hidden' di sini */}
       <div className="min-h-screen bg-background flex flex-col"> 
         <TopBar />
         <Header />
@@ -36,6 +37,5 @@ const Index = () => {
     </>
   );
 };
-
 
 export default Index;

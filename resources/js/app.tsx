@@ -1,44 +1,39 @@
-import '../css/app.css';
+import "../css/app.css";
+import "../css/ads.css";
 
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
+import { createInertiaApp } from "@inertiajs/react";
+import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { initializeTheme } from "./hooks/use-appearance";
 
-// Tambahan Library dari Lovable
-import { HelmetProvider } from 'react-helmet-async';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
-// Membuat instance QueryClient
+const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 const queryClient = new QueryClient();
 
-// Jalankan tema sebelum render dimulai
 initializeTheme();
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
+
     resolve: (name) =>
         resolvePageComponent(
-            `./pages/${name}.tsx`,
-            import.meta.glob('./pages/**/*.tsx'),
+            `./Pages/${name}.tsx`,
+            import.meta.glob("./Pages/**/*.tsx")
         ),
-    setup({ el, App, props }) {
-        const root = createRoot(el);
 
-        root.render(
+    setup({ el, App, props }) {
+        createRoot(el).render(
             <StrictMode>
                 <QueryClientProvider client={queryClient}>
-                    <HelmetProvider>
-                        <App {...props} />
-                    </HelmetProvider>
+                    <App {...props} />
                 </QueryClientProvider>
-            </StrictMode>,
+            </StrictMode>
         );
     },
+
     progress: {
-        color: '#FF7E00', // Sesuaikan warna progress bar ke Oranye
+        color: "#FF7E00",
     },
 });

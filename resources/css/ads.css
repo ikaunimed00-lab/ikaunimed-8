@@ -1,0 +1,322 @@
+/* ============================================
+   ADVERTISING SYSTEM STYLES
+   Global styling untuk semua ad slots & placements
+   ============================================ */
+
+/* -----------------------------------------------
+   AD CONTAINERS - Base Styling
+   ----------------------------------------------- */
+
+.ad-container,
+.ad-inline-container,
+.ad-sidebar-wrapper,
+.ad-list-item {
+  box-sizing: border-box;
+}
+
+/* -----------------------------------------------
+   INLINE ADS - In-Article Placements
+   ----------------------------------------------- */
+
+.ad-inline-container {
+  margin: 2rem 0;
+  width: 100%;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.ad-inline {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  padding: 2rem 1rem;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-inline:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ad-inline .ad-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+  .ad-inline-container {
+    margin: 1.5rem 0;
+  }
+
+  .ad-inline {
+    min-height: 250px;
+    padding: 1rem;
+  }
+
+  .ad-inline .ad-placeholder {
+    font-size: 0.75rem;
+  }
+}
+
+/* -----------------------------------------------
+   SIDEBAR ADS - Sticky Desktop Only
+   ----------------------------------------------- */
+
+.ad-sidebar-wrapper {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .ad-sidebar-wrapper {
+    display: block;
+  }
+}
+
+.ad-sidebar {
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ad-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ad-sidebar::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 3px;
+}
+
+.ad-sidebar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.ad-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Individual ad slots */
+.ad-slot {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ad-slot:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+.ad-slot .ad-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #9ca3af;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+/* Fixed dimensions untuk standard ad sizes */
+.ad-slot[style*="300px"] {
+  width: 300px;
+}
+
+/* -----------------------------------------------
+   LIST ADS - Between News Items
+   ----------------------------------------------- */
+
+.ad-list-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.ad-list-item:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-color: #d1d5db;
+}
+
+.ad-list-item .ad-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: #9ca3af;
+  min-height: 120px;
+}
+
+@media (max-width: 768px) {
+  .ad-list-item {
+    margin: 0.75rem 0;
+    padding: 0.75rem;
+  }
+
+  .ad-list-item .ad-placeholder {
+    min-height: 100px;
+    font-size: 0.75rem;
+  }
+}
+
+/* -----------------------------------------------
+   BANNER ADS - General use
+   ----------------------------------------------- */
+
+.ad-banner-container {
+  margin: 1.5rem 0;
+}
+
+.ad-banner {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.ad-banner:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ad-banner .ad-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: #9ca3af;
+  padding: 2rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .ad-banner-container {
+    margin: 1rem 0;
+  }
+
+  .ad-banner .ad-placeholder {
+    padding: 1.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* -----------------------------------------------
+   ADSENSE RESPONSIVE STYLES
+   For production Google AdSense integration
+   ----------------------------------------------- */
+
+ins.adsbygoogle {
+  display: block;
+}
+
+.ad-slot ins.adsbygoogle,
+.ad-banner ins.adsbygoogle,
+.ad-inline ins.adsbygoogle,
+.ad-list-item ins.adsbygoogle {
+  display: inline-block;
+}
+
+/* -----------------------------------------------
+   ANIMATIONS
+   ----------------------------------------------- */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* -----------------------------------------------
+   ACCESSIBILITY & PRINT
+   ----------------------------------------------- */
+
+@media print {
+  .ad-inline-container,
+  .ad-sidebar-wrapper,
+  .ad-list-item,
+  .ad-banner-container {
+    display: none !important;
+  }
+}
+
+/* For screen readers */
+.ad-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* -----------------------------------------------
+   DARK MODE SUPPORT
+   (if you implement dark mode later)
+   ----------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  .ad-inline,
+  .ad-slot,
+  .ad-banner {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    border-color: #4b5563;
+  }
+
+  .ad-inline .ad-placeholder,
+  .ad-slot .ad-placeholder,
+  .ad-banner .ad-placeholder,
+  .ad-list-item .ad-placeholder {
+    color: #9ca3af;
+  }
+
+  .ad-list-item {
+    background: #111827;
+    border-color: #374151;
+  }
+}
