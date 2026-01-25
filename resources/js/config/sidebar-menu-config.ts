@@ -180,5 +180,6 @@ export function getMenuByRole(role: UserRole): MenuItem[] {
  * Helper: Generate route dengan Ziggy
  */
 export function routeName(routeStr: string): string {
+    // @ts-ignore
     return route(routeStr);
 }
