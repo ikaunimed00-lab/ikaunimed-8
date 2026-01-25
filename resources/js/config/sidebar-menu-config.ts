@@ -181,5 +181,5 @@ export function getMenuByRole(role: UserRole): MenuItem[] {
  */
 export function routeName(routeStr: string): string {
     // @ts-ignore
-    return route(routeStr);
+    return (window as any).route(routeStr);
 }

@@ -8,6 +8,15 @@ import { createRoot } from "react-dom/client";
 import { initializeTheme } from "./hooks/use-appearance";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { route as routeFn } from "ziggy-js";
+
+// Polyfill global route function to ensure Ziggy config is picked up correctly
+if (typeof window !== "undefined") {
+    (window as any).route = (name: string, params?: any, absolute?: boolean, config?: any) => {
+        const ziggy = config || (window as any).Ziggy;
+        return routeFn(name, params, absolute, ziggy);
+    };
+}
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 const queryClient = new QueryClient();
