@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use App\Models\Education;
+
 class ProfileController extends Controller
 {
     /**
@@ -18,9 +20,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        return Inertia::render('settings/profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+        $user = $request->user()->load('educations');
+        
+        return Inertia::render('Dashboard/Subscriber/Profile/Edit', [
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'educations' => $user->educations,
         ]);
     }
 
@@ -29,13 +34,35 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validated = $request->validated();
+        
+        // Update user basic info
+        $request->user()->fill($validated);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
         $request->user()->save();
+
+        // Update educations
+        if (isset($validated['educations'])) {
+            // Kita hapus semua pendidikan lama dan insert yang baru (strategy simple sync)
+            // Atau update if exist. Karena structure fix D1-S3, kita bisa update or create.
+            // Tapi simple-nya: delete existing for this user, insert new non-empty ones.
+            
+            $user = $request->user();
+            
+            // Hapus yang lama
+            $user->educations()->delete();
+            
+            // Insert yang baru (filter yang kosong)
+            foreach ($validated['educations'] as $edu) {
+                if (!empty($edu['university']) || !empty($edu['major'])) {
+                    $user->educations()->create($edu);
+                }
+            }
+        }
 
         return to_route('profile.edit');
     }

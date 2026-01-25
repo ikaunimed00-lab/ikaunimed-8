@@ -1,10 +1,35 @@
 import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import { Link } from '@inertiajs/react';
 
 const Footer = () => {
   const links = {
-    layanan: ["Direktori Alumni", "Info Karir", "Kemitraan", "Kartu Alumni", "E-Voting"],
-    informasi: ["FAQ", "Hubungi Kami", "Sekretariat", "Agenda Kegiatan", "Donasi"],
-    organisasi: ["Tentang IKA", "Struktur Organisasi", "Berita", "Syarat & Ketentuan", "Kebijakan Privasi"],
+    layanan: [
+      { label: "Direktori Alumni", href: "/alumni" },
+      { label: "Karir & Profesional", href: "/karir" },
+      { label: "Beasiswa", href: "/beasiswa" },
+      { label: "Skill Upgrading", href: "/skill-upgrading" },
+      { label: "Kemitraan", href: "/kemitraan" },
+      { label: "Kartu Alumni", href: "/kartu-alumni" },
+      { label: "E-Voting", href: "/voting" },
+      { label: "Legalisir Ijazah", href: "/legalisir" },
+    ],
+    informasi: [
+      { label: "Kabar Alumni", href: "/kabar-alumni" },
+      { label: "Berita", href: "/berita" },
+      { label: "Agenda", href: "/agenda" },
+      { label: "Ruang Pengabdian", href: "/pengabdian" },
+      { label: "Galeri Foto", href: "/media/foto" },
+      { label: "Galeri Video", href: "/media/video" },
+      { label: "FAQ", href: "/faq" },
+    ],
+    organisasi: [
+      { label: "Tentang IKA UNIMED", href: "/tentang-kami" },
+      { label: "Struktur Organisasi", href: "/struktur-organisasi" },
+      { label: "Hubungi Kami & Sekretariat", href: "/hubungi-kami" },
+      { label: "Donasi", href: "/donasi" },
+      { label: "Syarat & Ketentuan", href: "/syarat-ketentuan" },
+      { label: "Kebijakan Privasi", href: "/kebijakan-privasi" },
+    ],
   };
 
   const socialLinks = [
@@ -75,11 +100,11 @@ const Footer = () => {
               </h4>
               <ul className="space-y-3">
                 {links[category as keyof typeof links].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-oxygen-teal transition-all flex items-center gap-2 group text-sm">
+                  <li key={link.label}>
+                    <Link href={link.href} className="text-gray-400 hover:text-oxygen-teal transition-all flex items-center gap-2 group text-sm">
                       <span className="h-px w-0 bg-oxygen-teal group-hover:w-3 transition-all"></span>
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

@@ -1,14 +1,9 @@
+// File: resources/js/layouts/AdminLayout.tsx
 import { PropsWithChildren, useState } from "react";
 import { Link, usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import {
-    Home,
-    Newspaper,
-    Users,
-    FileCheck,
-    LogOut,
-    Menu,
-} from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
+import { getMenuByRole } from "@/config/sidebar-menu-config";
 
 export default function AdminLayout({ children }: PropsWithChildren) {
     const { auth }: any = usePage().props;
@@ -22,11 +17,8 @@ export default function AdminLayout({ children }: PropsWithChildren) {
         router.post(route("logout"));
     }
 
-    /**
-     * ❗ ADMIN LAYOUT = ADMIN DASHBOARD ONLY
-     * Tidak ada role switching di layout
-     */
-    const dashboardRoute = route("dashboard.admin");
+    // ✅ Ambil menu dari config berdasarkan role
+    const menuItems = getMenuByRole("admin");
 
     return (
         <div className="min-h-screen flex bg-gradient-to-br from-white via-blue-50/30 to-white">
@@ -59,63 +51,39 @@ export default function AdminLayout({ children }: PropsWithChildren) {
                     </div>
                 </div>
 
-                {/* NAV */}
+                {/* NAV - DYNAMIC dari Config */}
                 <nav className="p-3 space-y-2 text-sm">
-                    <Link
-                        href={route("home")}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10"
-                    >
-                        <Home className="w-5 h-5 text-[#FF7E00]" />
-                        {sidebarOpen && "Home Portal"}
-                    </Link>
-
-                    <Link
-                        href={dashboardRoute}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10"
-                    >
-                        <BarChart3 className="w-5 h-5 text-[#00A69D]" />
-                        {sidebarOpen && "Dashboard"}
-                    </Link>
-
-                    <Link
-                        href={route("admin.news.index")}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10"
-                    >
-                        <Newspaper className="w-5 h-5 text-[#FF7E00]" />
-                        {sidebarOpen && "Kelola Berita"}
-                    </Link>
-
-                    {auth.user.role === "admin" && (
-                        <Link
-                            href={route("admin.users.index")}
-                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10"
-                        >
-                            <Users className="w-5 h-5 text-[#e9cf35]" />
-                            {sidebarOpen && "Kelola User"}
-                        </Link>
-                    )}
-
-                    {(auth.user.role === "admin" ||
-                        auth.user.role === "editor") && (
-                        <Link
-                            href={route("admin.legalizations.index")}
-                            className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10"
-                        >
-                            <FileCheck className="w-5 h-5 text-[#00A69D]" />
-                            {sidebarOpen && "Kelola Legalisasi"}
-                        </Link>
-                    )}
+                    {menuItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <Link
+                                key={item.route}
+                                href={route(item.route)}
+                                className="group flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-[#FF7E00]/20 hover:to-[#00A69D]/20 text-slate-300 hover:text-white transition-all duration-200 border border-transparent hover:border-[#FF7E00]/30"
+                            >
+                                <Icon className="w-5 h-5 text-[#FF7E00] group-hover:scale-110 transition-transform" />
+                                {sidebarOpen && (
+                                    <span className="font-semibold">{item.title}</span>
+                                )}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 {/* LOGOUT */}
                 <div className="p-3 border-t border-white/10 mt-auto">
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600/20 hover:bg-red-600/30"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-600/20 hover:bg-red-600/30 transition-colors"
                     >
                         <LogOut className="w-5 h-5" />
                         {sidebarOpen && "Logout"}
                     </button>
+                    {sidebarOpen && (
+                        <p className="text-xs text-slate-400 mt-3 px-2">
+                            👤 {auth.user.name}
+                        </p>
+                    )}
                 </div>
 
                 {/* TOGGLE */}
@@ -132,26 +100,5 @@ export default function AdminLayout({ children }: PropsWithChildren) {
             {/* CONTENT */}
             <main className="flex-1 p-6">{children}</main>
         </div>
-    );
-}
-
-/* ICON */
-function BarChart3(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M3 3v18h18" />
-            <path d="M7 16V9" />
-            <path d="M12 16V5" />
-            <path d="M17 16v-3" />
-        </svg>
     );
 }

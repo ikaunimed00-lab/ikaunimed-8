@@ -24,7 +24,7 @@ class UserController extends Controller
             ->orderBy('name')
             ->get();
 
-        return Inertia::render('Admin/Users/Index', [
+        return Inertia::render('Dashboard/Admin/Users/Index', [
             'users' => $users,
         ]);
     }

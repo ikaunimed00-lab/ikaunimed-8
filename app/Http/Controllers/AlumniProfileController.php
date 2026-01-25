@@ -15,6 +15,7 @@ class AlumniProfileController extends Controller
     public function edit()
     {
         $user = auth()->user();
+        $user->load('educations');
 
         // Get notifications for sidebar
         try {
@@ -40,17 +41,21 @@ class AlumniProfileController extends Controller
         $validated = $request->validate([
             // Identitas Pribadi
             'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'gender' => ['nullable', 'string', 'in:L,P'],
             'wa' => ['required', 'string', 'regex:/^(\+62|62|0)[0-9]{9,12}$/'],
             'nik' => ['required', 'string', 'size:16', 'regex:/^[0-9]{16}$/'],
             'tempat_lahir' => ['required', 'string', 'max:100'],
             'tanggal_lahir' => ['required', 'date', 'before:today'],
             'alamat_lengkap' => ['required', 'string', 'max:500'],
+            'domicile' => ['nullable', 'string', 'max:255'],
+            'occupation' => ['nullable', 'string', 'max:255'],
 
-            // Pendidikan S1
-            's1_fakultas' => ['required', 'string', 'max:150'],
-            's1_prodi' => ['required', 'string', 'max:150'],
-            's1_tahun_masuk' => ['required', 'integer', 'min:1990', 'max:' . now()->year],
-            's1_tahun_tamat' => ['required', 'integer', 'min:1990', 'max:' . now()->year],
+            // Pendidikan S1 (Legacy / Wajib)
+            's1_fakultas' => ['nullable', 'string', 'max:150'],
+            's1_prodi' => ['nullable', 'string', 'max:150'],
+            's1_tahun_masuk' => ['nullable', 'integer', 'min:1990', 'max:' . now()->year],
+            's1_tahun_tamat' => ['nullable', 'integer', 'min:1990', 'max:' . now()->year],
 
             // Pendidikan S2 (Opsional)
             's2_prodi' => ['nullable', 'string', 'max:150'],
@@ -61,16 +66,30 @@ class AlumniProfileController extends Controller
             's3_prodi' => ['nullable', 'string', 'max:150'],
             's3_tahun_masuk' => ['nullable', 'integer', 'min:1990', 'max:' . now()->year],
             's3_tahun_tamat' => ['nullable', 'integer', 'min:1990', 'max:' . now()->year],
+
+            // Riwayat Pendidikan (D1-S3)
+            'educations' => ['nullable', 'array'],
+            'educations.*.level' => ['required', 'string'],
+            'educations.*.university' => ['required', 'string'],
+            'educations.*.faculty' => ['nullable', 'string'],
+            'educations.*.major' => ['required', 'string'],
+            'educations.*.admission_year' => ['nullable', 'integer'],
+            'educations.*.graduation_year' => ['nullable', 'integer'],
+
         ], [
             'wa.regex' => 'Nomor WhatsApp tidak valid. Gunakan format: 0812xxxxxx atau +62812xxxxxx',
             'nik.size' => 'NIK harus terdiri dari 16 digit',
             'nik.regex' => 'NIK hanya boleh berisi angka',
-            's1_tahun_masuk.required' => 'Tahun masuk S1 harus diisi',
-            's1_tahun_tamat.required' => 'Tahun tamat S1 harus diisi',
         ]);
 
-        // Update user
-        $user->update($validated);
+        // Update user fields
+        $user->update(collect($validated)->except('educations')->toArray());
+
+        // Update educations
+        if ($request->has('educations')) {
+            $user->educations()->delete();
+            $user->educations()->createMany($request->educations);
+        }
 
         return redirect()->route('dashboard')
             ->with('success', 'Profil alumni berhasil diperbarui! Selamat datang di portal IKA UNIMED.');

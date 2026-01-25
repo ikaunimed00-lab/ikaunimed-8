@@ -6,10 +6,15 @@ use Inertia\Inertia;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\DatabaseController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\LegalizationController;
 use App\Http\Controllers\AlumniProfileController;
 use App\Http\Controllers\OAuthController;
+use App\Http\Controllers\Settings\ProfileController;
+
+use App\Http\Controllers\Info\PageController;
+use App\Http\Controllers\MediaController;
 
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\LegalizationAdminController;
@@ -17,8 +22,15 @@ use App\Http\Controllers\Dashboard\NotificationController;
 
 /* === KABAR ALUMNI === */
 use App\Http\Controllers\Community\AlumniPostController;
+use App\Http\Controllers\JobVacancyController;
+use App\Http\Controllers\Admin\StaticPageController;
 use App\Http\Controllers\Dashboard\AlumniPostDashboardController;
 use App\Http\Controllers\Dashboard\AlumniPostModerationController;
+use App\Http\Controllers\Dashboard\JobVacancyDashboardController;
+use App\Http\Controllers\ScholarshipController;
+use App\Http\Controllers\PartnershipController;
+use App\Http\Controllers\Dashboard\ScholarshipDashboardController;
+use App\Http\Controllers\Dashboard\PartnershipDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +50,21 @@ Route::get('/kategori/{category:slug}/trending', [CategoryController::class, 'tr
 
 /*
 |--------------------------------------------------------------------------
+| INFO PAGES & MEDIA
+|--------------------------------------------------------------------------
+*/
+Route::get('/tentang-kami', [PageController::class, 'about'])->name('info.about');
+Route::get('/struktur-organisasi', [PageController::class, 'structure'])->name('info.structure');
+Route::get('/faq', [PageController::class, 'faq'])->name('info.faq');
+Route::get('/syarat-ketentuan', [PageController::class, 'terms'])->name('info.terms');
+Route::get('/kebijakan-privasi', [PageController::class, 'privacy'])->name('info.privacy');
+Route::get('/hubungi-kami', [PageController::class, 'contact'])->name('info.contact');
+
+Route::get('/media/foto', [MediaController::class, 'photos'])->name('media.photos');
+Route::get('/media/video', [MediaController::class, 'videos'])->name('media.videos');
+
+/*
+|--------------------------------------------------------------------------
 | KABAR ALUMNI - PUBLIC
 |--------------------------------------------------------------------------
 */
@@ -46,6 +73,20 @@ Route::get('/kabar-alumni', [AlumniPostController::class, 'index'])
 
 Route::get('/kabar-alumni/{alumniPost:slug}', [AlumniPostController::class, 'show'])
     ->name('alumni-posts.show');
+
+/*
+|--------------------------------------------------------------------------
+| CAREER & PROFESSIONAL - PUBLIC
+|--------------------------------------------------------------------------
+*/
+Route::get('/lowongan-kerja', [JobVacancyController::class, 'index'])->name('jobs.index');
+Route::get('/lowongan-kerja/{vacancy:slug}', [JobVacancyController::class, 'show'])->name('jobs.show');
+
+Route::get('/beasiswa', [ScholarshipController::class, 'index'])->name('scholarships.index');
+Route::get('/beasiswa/{scholarship:slug}', [ScholarshipController::class, 'show'])->name('scholarships.show');
+
+Route::get('/kemitraan', [PartnershipController::class, 'index'])->name('partnerships.index');
+Route::get('/kemitraan/{partnership:slug}', [PartnershipController::class, 'show'])->name('partnerships.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +113,32 @@ Route::get('/auth/google/callback', [OAuthController::class, 'googleCallback'])
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
+
+/*
+|--------------------------------------------------------------------------
+| RAPIKAN DASHBOARD REDIRECT
+|--------------------------------------------------------------------------
+*/
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+
+        if (! $user) {
+            abort(403);
+        }
+
+        return match ($user->role) {
+            'admin'  => redirect()->route('dashboard.admin'),
+            'editor' => redirect()->route('dashboard.editor'),
+            'writer' => redirect()->route('dashboard.writer'),
+            default  => redirect()->route('dashboard.subscriber'),
+        };
+    })->middleware('auth')->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| SAMPAI SINI
+|--------------------------------------------------------------------------
+*/
 
     Route::post('/logout', function () {
         auth()->logout();
@@ -119,8 +186,8 @@ Route::middleware(['auth'])->group(function () {
     | PROFILE
     |--------------------------------------------------------------------------
     */
-    Route::get('/profile/edit', [AlumniProfileController::class, 'edit'])->name('profile.edit');
-    Route::post('/profile/update', [AlumniProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     /*
     |--------------------------------------------------------------------------
@@ -205,6 +272,21 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | JOBS, SCHOLARSHIPS, PARTNERSHIPS DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::resource('jobs', JobVacancyDashboardController::class);
+        
+        // Admin & Editor Only for Scholarships & Partnerships
+        Route::middleware(['role:admin,editor'])->group(function () {
+            Route::resource('scholarships', ScholarshipDashboardController::class);
+            Route::resource('partnerships', PartnershipDashboardController::class);
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | KABAR ALUMNI - SUBSCRIBER
     |--------------------------------------------------------------------------
     */
@@ -236,5 +318,27 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/alumni-posts/{alumniPost}/force', [AlumniPostModerationController::class, 'destroy'])
                 ->middleware('role:admin')
                 ->name('alumni-posts.force-delete');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN / EDITOR - DATABASE ALUMNI
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('dashboard')
+        ->middleware('role:admin,editor')
+        ->name('dashboard.')
+        ->group(function () {
+             Route::get('/database', [DatabaseController::class, 'index'])->name('database.index');
+             Route::get('/database/{user}', [DatabaseController::class, 'show'])->name('database.show');
+
+             /*
+             |--------------------------------------------------------------------------
+             | STATIC PAGES MANAGEMENT
+             |--------------------------------------------------------------------------
+             */
+             Route::get('/pages', [StaticPageController::class, 'index'])->name('admin.pages.index');
+             Route::get('/pages/{page}/edit', [StaticPageController::class, 'edit'])->name('admin.pages.edit');
+             Route::put('/pages/{page}', [StaticPageController::class, 'update'])->name('admin.pages.update');
         });
 });

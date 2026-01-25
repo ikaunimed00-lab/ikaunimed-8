@@ -18,6 +18,23 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            
+            'gender' => ['nullable', 'string', 'in:L,P'],
+            'tempat_lahir' => ['nullable', 'string', 'max:255'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'nik' => ['nullable', 'string', 'max:20'],
+            'wa' => ['nullable', 'string', 'max:20'],
+            'domicile' => ['nullable', 'string', 'max:255'],
+            'alamat_lengkap' => ['nullable', 'string'],
+            'occupation' => ['nullable', 'string', 'max:255'],
+
+            'educations' => ['nullable', 'array'],
+            'educations.*.level' => ['required', 'string'],
+            'educations.*.university' => ['nullable', 'string'],
+            'educations.*.faculty' => ['nullable', 'string'],
+            'educations.*.major' => ['nullable', 'string'],
+            'educations.*.admission_year' => ['nullable', 'numeric'],
+            'educations.*.graduation_year' => ['nullable', 'numeric'],
 
             'email' => [
                 'required',

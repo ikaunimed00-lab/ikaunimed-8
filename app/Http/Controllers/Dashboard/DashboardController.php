@@ -44,7 +44,7 @@ class DashboardController extends Controller
             'rejected' => $user->legalizations()->where('status', 'rejected')->count(),
         ];
 
-        return Inertia::render('Dashboard/Subscriber', [
+        return Inertia::render('Dashboard/Subscriber/Index', [
             'user' => $user,
             'legalizations' => $legalizations,
             'notifications' => $notifications,
@@ -96,7 +96,7 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        return Inertia::render('Dashboard/Admin', [
+        return Inertia::render('Dashboard/Admin/Index', [
             'user' => $user,
             'legalizations' => $legalizations,
             'notifications' => $notifications,
@@ -141,7 +141,7 @@ class DashboardController extends Controller
             $notifications = [];
         }
 
-        return Inertia::render('Dashboard/Editor', [
+        return Inertia::render('Dashboard/Editor/Index', [
             'user' => $user,
             'news' => $news,
             'notifications' => $notifications,
@@ -183,7 +183,7 @@ class DashboardController extends Controller
             $notifications = [];
         }
 
-        return Inertia::render('Dashboard/Writer', [
+        return Inertia::render('Dashboard/Writer/Index', [
             'user' => $user,
             'articles' => $articles,
             'notifications' => $notifications,

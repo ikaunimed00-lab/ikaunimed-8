@@ -41,23 +41,23 @@ class AlumniPostController extends Controller
     /**
      * Display a single published alumni post (PUBLIC)
      */
-    public function show(AlumniPost $post): Response
+    public function show(AlumniPost $alumniPost): Response
     {
         // Hanya tampilkan jika published
-        abort_if($post->status !== 'published', 404);
+        abort_if($alumniPost->status !== 'published', 404);
 
-        $post->load('user:id,name,s1_prodi,s1_tahun_tamat');
+        $alumniPost->load('user:id,name,s1_prodi,s1_tahun_tamat');
 
         // Get related posts (same category)
         $relatedPosts = AlumniPost::with('user:id,name')
             ->published()
-            ->where('category', $post->category)
-            ->where('id', '!=', $post->id)
+            ->where('category', $alumniPost->category)
+            ->where('id', '!=', $alumniPost->id)
             ->limit(3)
             ->get();
 
         return Inertia::render('Community/AlumniPost/Show', [
-            'post' => $post,
+            'post' => $alumniPost,
             'relatedPosts' => $relatedPosts,
         ]);
     }

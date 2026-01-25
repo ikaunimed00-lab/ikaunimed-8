@@ -38,7 +38,7 @@ class LegalizationController extends Controller
                 'created_at' => $item->created_at,
             ]);
 
-        return Inertia::render('Legalization/Index', [
+        return Inertia::render('Dashboard/Subscriber/Legalization/Index', [
             'legalizations' => $legalizations,
             'user' => $user,
             'notifications' => $notifications,
@@ -60,7 +60,7 @@ class LegalizationController extends Controller
             $notifications = [];
         }
 
-        return Inertia::render('Legalization/Create', [
+        return Inertia::render('Dashboard/Subscriber/Legalization/Create', [
             'user' => $user,
             'notifications' => $notifications,
             'stats' => [],
@@ -112,7 +112,7 @@ class LegalizationController extends Controller
 
         $legalization->load('files');
 
-        return Inertia::render('Legalization/Show', [
+        return Inertia::render('Dashboard/Subscriber/Legalization/Show', [
             'legalization' => $legalization,
             'user' => $user,
             'notifications' => $notifications,

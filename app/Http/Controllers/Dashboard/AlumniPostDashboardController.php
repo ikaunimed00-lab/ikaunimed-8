@@ -56,13 +56,21 @@ class AlumniPostDashboardController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:50',
             'category' => 'required|in:' . implode(',', array_keys(AlumniPost::categories())),
+            'image' => 'nullable|image|max:2048',
+            'map_location' => 'nullable|string',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('alumni-posts', 'public');
+        }
 
         $post = AlumniPost::create([
             'user_id' => auth()->id(),
             'title' => $validated['title'],
             'content' => $validated['content'],
             'category' => $validated['category'],
+            'image' => $validated['image'] ?? null,
+            'map_location' => $validated['map_location'] ?? null,
             'status' => 'pending', // Always pending, butuh moderasi
         ]);
 
@@ -94,12 +102,22 @@ class AlumniPostDashboardController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string|min:50',
             'category' => 'required|in:' . implode(',', array_keys(AlumniPost::categories())),
+            'image' => 'nullable|image|max:2048',
+            'map_location' => 'nullable|string',
         ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($alumniPost->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($alumniPost->image);
+            }
+            $validated['image'] = $request->file('image')->store('alumni-posts', 'public');
+        }
 
         $alumniPost->update($validated);
 
         return redirect()->route('dashboard.subscriber.alumni-posts.index')
-            ->with('success', 'Kabar Alumni berhasil diupdate.');
+            ->with('success', 'Kabar Alumni berhasil diperbarui.');
     }
 
     /**

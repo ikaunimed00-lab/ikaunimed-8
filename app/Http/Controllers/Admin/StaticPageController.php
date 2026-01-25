@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\StaticPage;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class StaticPageController extends Controller
+{
+    public function index()
+    {
+        $pages = StaticPage::orderBy('title')->get();
+
+        return Inertia::render('Dashboard/Admin/Pages/Index', [
+            'pages' => $pages,
+        ]);
+    }
+
+    public function edit(StaticPage $page)
+    {
+        return Inertia::render('Dashboard/Admin/Pages/Edit', [
+            'page' => $page,
+        ]);
+    }
+
+    public function update(Request $request, StaticPage $page)
+    {
+        $validated = $request->validate([
+            'content' => 'required|string',
+            'is_active' => 'boolean',
+        ]);
+
+        $page->update($validated);
+
+        return redirect()->route('dashboard.admin.pages.index')
+            ->with('success', 'Halaman berhasil diperbarui.');
+    }
+}

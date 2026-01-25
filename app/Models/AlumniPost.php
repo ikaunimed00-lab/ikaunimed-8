@@ -16,6 +16,8 @@ class AlumniPost extends Model
         'slug',
         'content',
         'category',
+        'image',
+        'map_location',
         'status',
         'rejection_note',
         'moderated_by',
@@ -29,17 +31,19 @@ class AlumniPost extends Model
     /**
      * Available categories
      */
+    public const CATEGORIES = [
+        'prestasi' => 'Alumni Berprestasi',
+        'pernikahan' => 'Pernikahan Alumni',
+        'wafat' => 'Alumni Wafat',
+        'usaha' => 'Usaha Alumni',
+        'beasiswa' => 'Beasiswa Alumni',
+        'karir' => 'Karir Alumni',
+        'lainnya' => 'Lainnya',
+    ];
+
     public static function categories(): array
     {
-        return [
-            'prestasi' => 'Alumni Berprestasi',
-            'pernikahan' => 'Pernikahan Alumni',
-            'wafat' => 'Alumni Wafat',
-            'usaha' => 'Usaha Alumni',
-            'beasiswa' => 'Beasiswa Alumni',
-            'karir' => 'Karir Alumni',
-            'lainnya' => 'Lainnya',
-        ];
+        return self::CATEGORIES;
     }
 
     /**

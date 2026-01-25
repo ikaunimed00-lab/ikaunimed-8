@@ -21,9 +21,12 @@ class User extends Authenticatable
 
         'wa',
         'nik',
+        'gender',
         'tempat_lahir',
         'tanggal_lahir',
         'alamat_lengkap',
+        'domicile',
+        'occupation',
 
         's1_fakultas',
         's1_prodi',
@@ -99,6 +102,11 @@ class User extends Authenticatable
     public function alumniPosts()
     {
         return $this->hasMany(AlumniPost::class);
+    }
+
+    public function educations()
+    {
+        return $this->hasMany(Education::class);
     }
 
     public function moderatedAlumniPosts()

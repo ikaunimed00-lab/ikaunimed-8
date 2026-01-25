@@ -1,4 +1,5 @@
-import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
+// import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout'; //** Diganti dengan bawah oleh Calude AI 23-01/2026 15:50 */
+import AdminLayout from '@/layouts/AdminLayout'; 
 import { type BreadcrumbItem } from '@/types';
 import { type ReactNode } from 'react';
 import { Head } from '@inertiajs/react';
@@ -11,7 +12,7 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children, breadcrumbs = [], title, ...props }: AppLayoutProps) {
     return (
-        <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
+        <AdminLayout breadcrumbs={breadcrumbs} {...props}>
             {/* SEO Dasar untuk Dashboard */}
             <Head title={title} />
             
@@ -21,6 +22,6 @@ export default function AppLayout({ children, breadcrumbs = [], title, ...props 
                     {children}
                 </div>
             </div>
-        </AppLayoutTemplate>
+        </AdminLayout>
     );
 }

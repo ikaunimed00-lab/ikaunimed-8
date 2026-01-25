@@ -227,7 +227,14 @@ class NewsController extends Controller
                 'categories' => $item->categories->pluck('name')->toArray(),
             ]);
 
-        return Inertia::render('Admin/News/Index', [
+        $view = match ($user->role) {
+            'admin' => 'Dashboard/Admin/News/Index',
+            'editor' => 'Dashboard/Editor/News/Index',
+            'writer' => 'Dashboard/Writer/News/Index',
+            default => 'Dashboard/Admin/News/Index',
+        };
+
+        return Inertia::render($view, [
             'news' => $news,
             'filters' => [
                 'search' => $request->search,
@@ -244,7 +251,15 @@ class NewsController extends Controller
 
     public function create()
     {
-        return Inertia::render('Admin/News/Create', [
+        $user = Auth::user();
+        $view = match ($user->role) {
+            'admin' => 'Dashboard/Admin/News/Create',
+            'editor' => 'Dashboard/Editor/News/Create',
+            'writer' => 'Dashboard/Writer/News/Create',
+            default => 'Dashboard/Admin/News/Create',
+        };
+
+        return Inertia::render($view, [
             'authors' => User::select('id', 'name', 'role')
                 ->where('role', '!=', null)
                 ->orderBy('name')
@@ -304,12 +319,19 @@ class NewsController extends Controller
     {
         $user = Auth::user();
 
-        // Writers hanya bisa edit berita mereka sendiri, editors & admin bisa edit semua
-        if ($user->isWriter() && !$user->isEditor() && $news->user_id !== $user->id) {
-            abort(403, 'Anda hanya bisa mengedit berita milik Anda sendiri.');
+        // Writer hanya bisa edit beritanya sendiri
+        if ($user->isWriter() && $news->user_id !== $user->id) {
+            abort(403);
         }
 
-        return Inertia::render('Admin/News/Edit', [
+        $view = match ($user->role) {
+            'admin' => 'Dashboard/Admin/News/Edit',
+            'editor' => 'Dashboard/Editor/News/Edit',
+            'writer' => 'Dashboard/Writer/News/Edit',
+            default => 'Dashboard/Admin/News/Edit',
+        };
+
+        return Inertia::render($view, [
             'news' => [
                 'id' => $news->id,
                 'title' => $news->title,
@@ -324,12 +346,12 @@ class NewsController extends Controller
             ],
             'authors' => User::select('id', 'name', 'role')
                 ->where('role', '!=', null)
+                ->orderBy('name')
                 ->get(),
             'categories' => Category::select('id', 'name', 'slug')
                 ->orderBy('order')
                 ->orderBy('name')
                 ->get(),
-            'authRole' => $user->role,
         ]);
     }
 

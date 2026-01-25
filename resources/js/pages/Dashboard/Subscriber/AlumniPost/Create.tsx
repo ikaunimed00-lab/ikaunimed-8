@@ -12,11 +12,15 @@ export default function Create({ categories }: Props) {
     title: "",
     content: "",
     category: "",
+    image: null as File | null,
+    map_location: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route("dashboard.subscriber.alumni-posts.store"));
+    post(route("dashboard.subscriber.alumni-posts.store"), {
+      forceFormData: true,
+    });
   };
 
   return (
@@ -100,6 +104,50 @@ export default function Create({ categories }: Props) {
               )}
             </div>
           </div>
+
+          {/* Optional Fields for Specific Categories */}
+          {(data.category === 'pernikahan' || data.category === 'wafat' || data.category === 'usaha') && (
+             <div className="space-y-6 pt-4 border-t border-gray-100">
+                <h3 className="font-medium text-gray-900">Data Tambahan (Opsional)</h3>
+                
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Foto / Gambar
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setData("image", e.target.files ? e.target.files[0] : null)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                  />
+                  {errors.image && (
+                    <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">Format: JPG, PNG, JPEG. Maks: 2MB.</p>
+                </div>
+
+                {/* Map Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Lokasi / Peta (Google Maps Embed URL)
+                  </label>
+                  <input
+                    type="text"
+                    value={data.map_location}
+                    onChange={(e) => setData("map_location", e.target.value)}
+                    placeholder='<iframe src="https://www.google.com/maps/embed?...'
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  {errors.map_location && (
+                    <p className="mt-1 text-sm text-red-600">{errors.map_location}</p>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">
+                    Paste kode embed (iframe) dari Google Maps untuk menampilkan peta lokasi acara/usaha.
+                  </p>
+                </div>
+             </div>
+          )}
 
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

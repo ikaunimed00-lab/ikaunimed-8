@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Head, Link, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import MainLayout from "@/components/MainLayout";
 
 interface AlumniPost {
   id: number;
@@ -78,7 +79,7 @@ export default function Index({ posts, categories, filters }: Props) {
   };
 
   return (
-    <>
+    <MainLayout variant="full">
       <Head title="Kabar Alumni" />
 
       <div className="min-h-screen bg-gray-50">
@@ -223,6 +224,6 @@ export default function Index({ posts, categories, filters }: Props) {
           )}
         </div>
       </div>
-    </>
+    </MainLayout>
   );
 }

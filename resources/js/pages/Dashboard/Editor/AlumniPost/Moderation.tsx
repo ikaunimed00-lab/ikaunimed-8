@@ -1,7 +1,9 @@
+// File: resources/js/Pages/Dashboard/Editor/AlumniPost/Moderation.tsx
 import React, { useState } from "react";
-import { Head, Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import EditorLayout from "@/Layouts/EditorLayout";
+import EditorLayout from "@/layouts/EditorLayout";
+import AdminLayout from "@/layouts/AdminLayout";
 
 interface AlumniPost {
   id: number;
@@ -19,8 +21,8 @@ interface AlumniPost {
 interface Props {
   posts: {
     data: AlumniPost[];
-    links: any;
-    meta: any;
+    links?: any;
+    meta?: any;
   };
   stats: Record<string, number>;
   categories: Record<string, string>;
@@ -80,8 +82,15 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
     router.get(route("dashboard.editor.alumni-posts.moderation"));
   };
 
+  // ✅ FIX: Safe access untuk posts.meta
+  const totalPosts = posts?.meta?.total || posts?.data?.length || 0;
+  const hasPagination = posts?.meta?.last_page && posts?.links && posts.meta.last_page > 1;
+
+  const { auth }: any = usePage().props;
+  const LayoutComponent = auth?.user?.role === "admin" ? AdminLayout : EditorLayout;
+
   return (
-    <EditorLayout>
+    <LayoutComponent>
       <Head title="Moderasi Kabar Alumni" />
 
       <div className="space-y-6">
@@ -97,7 +106,7 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Kabar</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total || 0}</p>
+                <p className="text-2xl font-bold text-gray-900">{stats?.total || 0}</p>
               </div>
               <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +120,7 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pending || 0}</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats?.pending || 0}</p>
               </div>
               <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +134,7 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Published</p>
-                <p className="text-2xl font-bold text-green-600">{stats.published || 0}</p>
+                <p className="text-2xl font-bold text-green-600">{stats?.published || 0}</p>
               </div>
               <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +148,7 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Rejected</p>
-                <p className="text-2xl font-bold text-red-600">{stats.rejected || 0}</p>
+                <p className="text-2xl font-bold text-red-600">{stats?.rejected || 0}</p>
               </div>
               <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,11 +234,11 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
               Daftar Kabar Alumni
             </h3>
             <p className="text-sm text-gray-600 mt-1">
-              Total: {posts.meta.total} kabar
+              Total: {totalPosts} kabar
             </p>
           </div>
 
-          {posts.data.length === 0 ? (
+          {!posts?.data || posts.data.length === 0 ? (
             <div className="p-8 text-center">
               <p className="text-gray-500">Tidak ada kabar yang sesuai filter</p>
             </div>
@@ -303,7 +312,7 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
           )}
 
           {/* Pagination */}
-          {posts.meta.last_page > 1 && (
+          {hasPagination && (
             <div className="px-6 py-4 border-t border-gray-200 flex justify-center gap-2">
               {posts.links.map((link: any, idx: number) => (
                 <Link
@@ -321,6 +330,6 @@ export default function Moderation({ posts, stats, categories, filters }: Props)
           )}
         </div>
       </div>
-    </EditorLayout>
+    </LayoutComponent>
   );
 }

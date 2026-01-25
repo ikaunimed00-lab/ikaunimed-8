@@ -4,38 +4,31 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\AlumniPost;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class AlumniPostModerationController extends Controller
 {
-    /**
-     * Display all posts for moderation
-     */
-    public function index(): Response
+    public function index(Request $request)
     {
-        $this->authorize('moderate', AlumniPost::class);
-
-        $status = request('status', 'pending');
-        $category = request('category');
-        $search = request('search');
-
-        $posts = AlumniPost::with('user:id,name,email')
-            ->when($status !== 'all', fn($q) => $q->where('status', $status))
-            ->when($category, fn($q) => $q->category($category))
-            ->when($search, function($q) use ($search) {
-                $q->where(function($query) use ($search) {
-                    $query->where('title', 'like', "%{$search}%")
-                          ->orWhereHas('user', function($q) use ($search) {
-                              $q->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
-                          });
+        $query = AlumniPost::with('user')
+            ->when($request->status && $request->status !== 'all', function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->when($request->category, function ($q) use ($request) {
+                $q->where('category', $request->category);
+            })
+            ->when($request->search, function ($q) use ($request) {
+                $q->where(function ($query) use ($request) {
+                    $query->where('title', 'like', '%' . $request->search . '%')
+                        ->orWhereHas('user', function ($q) use ($request) {
+                            $q->where('name', 'like', '%' . $request->search . '%');
+                        });
                 });
             })
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->orderBy('created_at', 'desc');
+
+        $posts = $query->paginate(10)->withQueryString();
 
         $stats = [
             'total' => AlumniPost::count(),
@@ -47,53 +40,34 @@ class AlumniPostModerationController extends Controller
         return Inertia::render('Dashboard/Editor/AlumniPost/Moderation', [
             'posts' => $posts,
             'stats' => $stats,
-            'categories' => AlumniPost::categories(),
-            'filters' => [
-                'status' => $status,
-                'category' => $category,
-                'search' => $search,
-            ],
+            'categories' => AlumniPost::CATEGORIES,
+            'filters' => $request->only(['status', 'category', 'search']),
         ]);
     }
 
-    /**
-     * Show single post for moderation
-     */
-    public function show(AlumniPost $alumniPost): Response
+    public function show(AlumniPost $alumniPost)
     {
-        $this->authorize('moderate', AlumniPost::class);
+        $alumniPost->load('user');
 
-        $alumniPost->load('user', 'moderator');
-
-        return Inertia::render('Dashboard/Editor/AlumniPost/ModerationDetail', [
+        return Inertia::render('Dashboard/Editor/AlumniPost/Show', [
             'post' => $alumniPost,
+            'categories' => AlumniPost::CATEGORIES,
         ]);
     }
 
-    /**
-     * Approve post
-     */
-    public function approve(AlumniPost $alumniPost): RedirectResponse
+    public function approve(AlumniPost $alumniPost)
     {
-        $this->authorize('moderate', AlumniPost::class);
-
         $alumniPost->update([
             'status' => 'published',
             'published_at' => now(),
-            'moderated_by' => auth()->id(),
             'rejection_note' => null,
         ]);
 
-        return back()->with('success', 'Kabar Alumni berhasil dipublish.');
+        return redirect()->back()->with('success', 'Kabar alumni berhasil dipublikasikan');
     }
 
-    /**
-     * Reject post
-     */
-    public function reject(Request $request, AlumniPost $alumniPost): RedirectResponse
+    public function reject(Request $request, AlumniPost $alumniPost)
     {
-        $this->authorize('moderate', AlumniPost::class);
-
         $validated = $request->validate([
             'rejection_note' => 'required|string|min:10',
         ]);
@@ -101,22 +75,16 @@ class AlumniPostModerationController extends Controller
         $alumniPost->update([
             'status' => 'rejected',
             'rejection_note' => $validated['rejection_note'],
-            'moderated_by' => auth()->id(),
         ]);
 
-        return back()->with('success', 'Kabar Alumni ditolak dengan catatan.');
+        return redirect()->back()->with('success', 'Kabar alumni ditolak');
     }
 
-    /**
-     * Force delete (Admin only)
-     */
-    public function destroy(AlumniPost $alumniPost): RedirectResponse
+    public function destroy(AlumniPost $alumniPost)
     {
-        $this->authorize('forceDelete', $alumniPost);
-
         $alumniPost->delete();
 
         return redirect()->route('dashboard.editor.alumni-posts.moderation')
-            ->with('success', 'Kabar Alumni berhasil dihapus permanen.');
+            ->with('success', 'Kabar alumni berhasil dihapus');
     }
 }

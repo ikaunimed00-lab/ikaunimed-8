@@ -39,7 +39,7 @@ class LegalizationAdminController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return Inertia::render('Dashboard/Admin/Legalizations', [
+        return Inertia::render('Dashboard/Admin/Legalizations/Index', [
             'legalizations' => $legalizations,
             'filters' => $request->only([
                 'status',
@@ -52,7 +52,7 @@ class LegalizationAdminController extends Controller
 
     public function show(Legalization $legalization)
     {
-        return Inertia::render('Dashboard/Admin/LegalizationDetail', [
+        return Inertia::render('Dashboard/Admin/Legalizations/Show', [
             'legalization' => $legalization->load('user', 'files'),
         ]);
     }
