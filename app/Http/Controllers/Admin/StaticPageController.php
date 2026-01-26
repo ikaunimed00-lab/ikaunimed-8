@@ -28,8 +28,8 @@ class StaticPageController extends Controller
     public function update(Request $request, StaticPage $page)
     {
         $validated = $request->validate([
+            'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'is_active' => 'boolean',
         ]);
 
         $page->update($validated);

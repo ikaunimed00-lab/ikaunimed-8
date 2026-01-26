@@ -3,6 +3,7 @@ import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
+import SubscriberLayout from '@/Layouts/SubscriberLayout';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,9 @@ import Editor from '@/components/Editor';
 
 export default function Edit({ partnership }: any) {
     const { auth }: any = usePage().props;
-    const Layout = auth.user.role === 'admin' ? AdminLayout : EditorLayout;
+    const userRole = auth.user.role;
+    const Layout = userRole === 'admin' ? AdminLayout : 
+                   userRole === 'editor' ? EditorLayout : SubscriberLayout;
 
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
@@ -20,7 +23,7 @@ export default function Edit({ partnership }: any) {
         category: partnership.category,
         description: partnership.description || '',
         benefit_details: partnership.benefit_details || '',
-        is_active: Boolean(partnership.is_active),
+        status: partnership.status,
         logo: null as File | null,
     });
 
@@ -36,6 +39,12 @@ export default function Edit({ partnership }: any) {
     };
 
     const categories = ['Perusahaan', 'Pemerintah', 'Universitas', 'Lainnya'];
+    const statuses = [
+        { value: 'active', label: 'Aktif' },
+        { value: 'pending', label: 'Menunggu' },
+        { value: 'rejected', label: 'Ditolak' },
+        { value: 'closed', label: 'Ditutup' },
+    ];
 
     return (
         <Layout>
@@ -72,6 +81,7 @@ export default function Edit({ partnership }: any) {
                                     id="name"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
+                                    placeholder="Contoh: PT. Pertamina (Persero)"
                                 />
                                 {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
                             </div>
@@ -99,6 +109,7 @@ export default function Edit({ partnership }: any) {
                                 type="url"
                                 value={data.website}
                                 onChange={(e) => setData('website', e.target.value)}
+                                placeholder="https://..."
                             />
                             {errors.website && <p className="text-sm text-red-600">{errors.website}</p>}
                         </div>
@@ -115,7 +126,7 @@ export default function Edit({ partnership }: any) {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="benefit_details">Detail Manfaat Kerjasama (Opsional)</Label>
+                            <Label htmlFor="benefit_details">Detail Manfaat (untuk Alumni) <span className="text-red-500">*</span></Label>
                             <div className="prose max-w-none">
                                 <Editor
                                     value={data.benefit_details}
@@ -125,41 +136,51 @@ export default function Edit({ partnership }: any) {
                             {errors.benefit_details && <p className="text-sm text-red-600">{errors.benefit_details}</p>}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="logo">Update Logo</Label>
-                                <Input
-                                    id="logo"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setData('logo', e.target.files ? e.target.files[0] : null)}
-                                    className="cursor-pointer"
-                                />
-                                {partnership.logo && (
-                                    <div className="mt-2 text-xs text-gray-500">
-                                        Logo saat ini: {partnership.logo}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex items-center space-x-2 pt-8">
-                                <input
-                                    type="checkbox"
-                                    id="is_active"
-                                    checked={data.is_active}
-                                    onChange={(e) => setData('is_active', e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
-                                />
-                                <Label htmlFor="is_active" className="cursor-pointer">Aktifkan Kemitraan Ini</Label>
-                            </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="logo">Logo Mitra (Opsional)</Label>
+                            {partnership.logo && (
+                                <div className="mb-2">
+                                    <img 
+                                        src={`/storage/${partnership.logo}`} 
+                                        alt="Logo Mitra" 
+                                        className="h-20 w-auto object-contain border rounded p-1"
+                                    />
+                                </div>
+                            )}
+                            <Input
+                                id="logo"
+                                type="file"
+                                onChange={(e) => setData('logo', e.target.files ? e.target.files[0] : null)}
+                                accept="image/*"
+                            />
+                            <p className="text-xs text-gray-500">
+                                Format: JPG, PNG. Maksimal 2MB.
+                            </p>
+                            {errors.logo && <p className="text-sm text-red-600">{errors.logo}</p>}
                         </div>
 
-                        <div className="flex items-center justify-end pt-6 border-t border-gray-100">
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
+                        <div className="space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            {(userRole === 'admin' || userRole === 'editor') ? (
+                                <select
+                                    id="status"
+                                    value={data.status}
+                                    onChange={(e) => setData('status', e.target.value)}
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    {statuses.map((s) => (
+                                        <option key={s.value} value={s.value}>{s.label}</option>
+                                    ))}
+                                </select>
+                            ) : (
+                                <div className="px-3 py-2 border rounded-md bg-gray-50 text-gray-700 capitalize">
+                                    {statuses.find(s => s.value === data.status)?.label || data.status}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex justify-end pt-6 border-t">
+                            <Button type="submit" disabled={processing} className="bg-blue-600 hover:bg-blue-700">
                                 <Save className="w-4 h-4 mr-2" />
                                 {processing ? 'Menyimpan...' : 'Simpan Perubahan'}
                             </Button>

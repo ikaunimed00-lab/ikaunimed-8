@@ -12,7 +12,13 @@ class PartnershipDashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
         $query = Partnership::query()->latest();
+
+        // Filter for subscribers
+        if (!$user->isEditor()) {
+            $query->where('user_id', $user->id);
+        }
 
         return Inertia::render('Dashboard/Partnership/Index', [
             'partnerships' => $query->paginate(10),
@@ -39,8 +45,12 @@ class PartnershipDashboardController extends Controller
             $validated['logo'] = $request->file('logo')->store('partnerships', 'public');
         }
 
+        $user = auth()->user();
+        $validated['user_id'] = $user->id;
         $validated['slug'] = Str::slug($validated['name'] . '-' . Str::random(6));
-        $validated['is_active'] = true;
+        
+        // Auto-approve for admins/editors, pending for subscribers
+        $validated['status'] = $user->isEditor() ? 'active' : 'pending';
 
         Partnership::create($validated);
 
@@ -50,6 +60,11 @@ class PartnershipDashboardController extends Controller
 
     public function edit(Partnership $partnership)
     {
+        // Authorization check
+        if (!auth()->user()->isEditor() && auth()->id() !== $partnership->user_id) {
+            abort(403);
+        }
+
         return Inertia::render('Dashboard/Partnership/Edit', [
             'partnership' => $partnership,
         ]);
@@ -57,15 +72,26 @@ class PartnershipDashboardController extends Controller
 
     public function update(Request $request, Partnership $partnership)
     {
-        $validated = $request->validate([
+        // Authorization check
+        if (!auth()->user()->isEditor() && auth()->id() !== $partnership->user_id) {
+            abort(403);
+        }
+
+        $rules = [
             'name' => 'required|string|max:255',
             'category' => 'required|string',
             'website' => 'nullable|url',
             'description' => 'nullable|string',
             'benefit_details' => 'nullable|string',
-            'is_active' => 'boolean',
             'logo' => 'nullable|image|max:2048',
-        ]);
+        ];
+
+        // Only admin/editor can update status directly
+        if (auth()->user()->isEditor()) {
+            $rules['status'] = 'required|in:active,pending,rejected,closed';
+        }
+
+        $validated = $request->validate($rules);
 
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo')->store('partnerships', 'public');
@@ -79,8 +105,35 @@ class PartnershipDashboardController extends Controller
 
     public function destroy(Partnership $partnership)
     {
+        // Authorization check
+        if (!auth()->user()->isEditor() && auth()->id() !== $partnership->user_id) {
+            abort(403);
+        }
+
         $partnership->delete();
 
         return redirect()->back()->with('success', 'Kemitraan berhasil dihapus.');
+    }
+
+    public function approve(Partnership $partnership)
+    {
+        if (!auth()->user()->isEditor()) {
+            abort(403);
+        }
+
+        $partnership->update(['status' => 'active']);
+
+        return redirect()->back()->with('success', 'Kemitraan berhasil disetujui.');
+    }
+
+    public function reject(Partnership $partnership)
+    {
+        if (!auth()->user()->isEditor()) {
+            abort(403);
+        }
+
+        $partnership->update(['status' => 'rejected']);
+
+        return redirect()->back()->with('success', 'Kemitraan berhasil ditolak.');
     }
 }

@@ -189,16 +189,26 @@ export default function Edit({ job }: any) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6">
                             <div className="space-y-2">
                                 <Label htmlFor="status">Status Publikasi</Label>
-                                <select
-                                    id="status"
-                                    value={data.status}
-                                    onChange={(e) => setData('status', e.target.value)}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="active">Active (Tayang)</option>
-                                    <option value="pending">Pending (Menunggu Moderasi)</option>
-                                    <option value="closed">Closed (Ditutup)</option>
-                                </select>
+                                {(userRole === 'admin' || userRole === 'editor') ? (
+                                    <select
+                                        id="status"
+                                        value={data.status}
+                                        onChange={(e) => setData('status', e.target.value)}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <option value="active">Active (Tayang)</option>
+                                        <option value="pending">Pending (Menunggu Moderasi)</option>
+                                        <option value="closed">Closed (Ditutup)</option>
+                                        <option value="rejected">Rejected (Ditolak)</option>
+                                    </select>
+                                ) : (
+                                    <div className="flex h-10 w-full items-center rounded-md border border-input bg-gray-100 px-3 py-2 text-sm text-gray-500">
+                                        {data.status === 'active' ? 'Active (Tayang)' : 
+                                         data.status === 'pending' ? 'Pending (Menunggu Moderasi)' : 
+                                         data.status === 'closed' ? 'Closed (Ditutup)' : 
+                                         'Rejected (Ditolak)'}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">

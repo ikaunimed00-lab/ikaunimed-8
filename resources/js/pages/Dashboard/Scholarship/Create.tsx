@@ -3,6 +3,7 @@ import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
+import SubscriberLayout from '@/Layouts/SubscriberLayout';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

@@ -79,7 +79,7 @@ class JobVacancyDashboardController extends Controller
             abort(403);
         }
 
-        $validated = $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'location' => 'required|string',
@@ -90,9 +90,15 @@ class JobVacancyDashboardController extends Controller
             'apply_link' => 'nullable|url',
             'apply_email' => 'nullable|email',
             'closing_date' => 'nullable|date',
-            'status' => 'required|in:active,pending,closed',
             'logo' => 'nullable|image|max:2048',
-        ]);
+        ];
+
+        // Only Admin/Editor can update status directly
+        if (auth()->user()->isAdminOrEditor()) {
+            $rules['status'] = 'required|in:active,pending,closed,rejected';
+        }
+
+        $validated = $request->validate($rules);
 
         if ($request->hasFile('logo')) {
             $validated['logo'] = $request->file('logo')->store('job-logos', 'public');
@@ -102,6 +108,28 @@ class JobVacancyDashboardController extends Controller
 
         return redirect()->route('dashboard.jobs.index')
             ->with('success', 'Lowongan berhasil diperbarui.');
+    }
+
+    public function approve(JobVacancy $job)
+    {
+        if (!auth()->user()->isAdminOrEditor()) {
+            abort(403);
+        }
+
+        $job->update(['status' => 'active']);
+
+        return redirect()->back()->with('success', 'Lowongan berhasil disetujui.');
+    }
+
+    public function reject(JobVacancy $job)
+    {
+        if (!auth()->user()->isAdminOrEditor()) {
+            abort(403);
+        }
+
+        $job->update(['status' => 'rejected']);
+
+        return redirect()->back()->with('success', 'Lowongan berhasil ditolak.');
     }
 
     public function destroy(JobVacancy $job)

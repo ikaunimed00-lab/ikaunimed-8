@@ -20,6 +20,9 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\LegalizationAdminController;
 use App\Http\Controllers\Dashboard\NotificationController;
 
+use App\Http\Controllers\Dashboard\OrganizationController as DashboardOrganizationController;
+use App\Http\Controllers\Dashboard\OrganizationMemberController;
+
 /* === KABAR ALUMNI === */
 use App\Http\Controllers\Community\AlumniPostController;
 use App\Http\Controllers\JobVacancyController;
@@ -31,6 +34,7 @@ use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\PartnershipController;
 use App\Http\Controllers\Dashboard\ScholarshipDashboardController;
 use App\Http\Controllers\Dashboard\PartnershipDashboardController;
+use App\Http\Controllers\PublicOrganizationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +66,15 @@ Route::get('/hubungi-kami', [PageController::class, 'contact'])->name('info.cont
 
 Route::get('/media/foto', [MediaController::class, 'photos'])->name('media.photos');
 Route::get('/media/video', [MediaController::class, 'videos'])->name('media.videos');
+
+/*
+|--------------------------------------------------------------------------
+| ORGANIZATION - PUBLIC
+|--------------------------------------------------------------------------
+*/
+// Public Organization Routes
+Route::get('/organisasi', [PublicOrganizationController::class, 'index'])->name('organizations.index');
+Route::get('/organisasi/{organization:slug}', [PublicOrganizationController::class, 'show'])->name('organizations.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -235,6 +248,20 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | ADMIN - ORGANIZATIONS
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('dashboard/admin')
+        ->middleware('role:admin')
+        ->name('dashboard.admin.')
+        ->group(function () {
+            Route::resource('organizations', DashboardOrganizationController::class);
+            Route::resource('organizations.members', OrganizationMemberController::class)->shallow();
+            Route::post('organizations/{organization}/members/reorder', [OrganizationMemberController::class, 'reorder'])->name('organizations.members.reorder');
+        });
+
+    /*
+    |--------------------------------------------------------------------------
     | ADMIN - USERS
     |--------------------------------------------------------------------------
     */
@@ -243,6 +270,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('admin.')
         ->group(function () {
             Route::get('/users', [UserController::class, 'index'])->name('users.index');
+            Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
             Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
             Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
             Route::post('/users/bulk-delete', [UserController::class, 'bulkDestroy'])->name('users.bulk-delete');
@@ -276,13 +304,17 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::post('jobs/{job}/approve', [JobVacancyDashboardController::class, 'approve'])->name('jobs.approve');
+        Route::post('jobs/{job}/reject', [JobVacancyDashboardController::class, 'reject'])->name('jobs.reject');
         Route::resource('jobs', JobVacancyDashboardController::class);
-        
-        // Admin & Editor Only for Scholarships & Partnerships
-        Route::middleware(['role:admin,editor'])->group(function () {
-            Route::resource('scholarships', ScholarshipDashboardController::class);
-            Route::resource('partnerships', PartnershipDashboardController::class);
-        });
+
+        Route::post('scholarships/{scholarship}/approve', [ScholarshipDashboardController::class, 'approve'])->name('scholarships.approve');
+        Route::post('scholarships/{scholarship}/reject', [ScholarshipDashboardController::class, 'reject'])->name('scholarships.reject');
+        Route::resource('scholarships', ScholarshipDashboardController::class);
+
+        Route::post('partnerships/{partnership}/approve', [PartnershipDashboardController::class, 'approve'])->name('partnerships.approve');
+        Route::post('partnerships/{partnership}/reject', [PartnershipDashboardController::class, 'reject'])->name('partnerships.reject');
+        Route::resource('partnerships', PartnershipDashboardController::class);
     });
 
     /*

@@ -3,6 +3,7 @@ import { Head, useForm, Link, usePage, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
+import SubscriberLayout from '@/Layouts/SubscriberLayout';
 import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,9 @@ import Editor from '@/components/Editor';
 
 export default function Edit({ scholarship }: any) {
     const { auth }: any = usePage().props;
-    const Layout = auth.user.role === 'admin' ? AdminLayout : EditorLayout;
+    const userRole = auth.user.role;
+    const Layout = userRole === 'admin' ? AdminLayout : 
+                   userRole === 'editor' ? EditorLayout : SubscriberLayout;
 
     const { data, setData, post, processing, errors } = useForm({
         _method: 'PUT',
@@ -158,15 +161,26 @@ export default function Edit({ scholarship }: any) {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6">
                             <div className="space-y-2">
                                 <Label htmlFor="status">Status Publikasi</Label>
-                                <select
-                                    id="status"
-                                    value={data.status}
-                                    onChange={(e) => setData('status', e.target.value)}
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    <option value="open">Open (Buka)</option>
-                                    <option value="closed">Closed (Tutup)</option>
-                                </select>
+                                {(userRole === 'admin' || userRole === 'editor') ? (
+                                    <select
+                                        id="status"
+                                        value={data.status}
+                                        onChange={(e) => setData('status', e.target.value)}
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <option value="active">Active (Tayang)</option>
+                                        <option value="pending">Pending (Menunggu Moderasi)</option>
+                                        <option value="closed">Closed (Ditutup)</option>
+                                        <option value="rejected">Rejected (Ditolak)</option>
+                                    </select>
+                                ) : (
+                                    <div className="flex h-10 w-full items-center rounded-md border border-input bg-gray-100 px-3 py-2 text-sm text-gray-500">
+                                        {data.status === 'active' ? 'Active (Tayang)' : 
+                                         data.status === 'pending' ? 'Pending (Menunggu Moderasi)' : 
+                                         data.status === 'closed' ? 'Closed (Ditutup)' : 
+                                         'Rejected (Ditolak)'}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">

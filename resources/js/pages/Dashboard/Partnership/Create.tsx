@@ -3,6 +3,7 @@ import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
+import SubscriberLayout from '@/Layouts/SubscriberLayout';
 import { ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -11,7 +12,9 @@ import Editor from '@/components/Editor';
 
 export default function Create() {
     const { auth }: any = usePage().props;
-    const Layout = auth.user.role === 'admin' ? AdminLayout : EditorLayout;
+    const userRole = auth.user.role;
+    const Layout = userRole === 'admin' ? AdminLayout : 
+                   userRole === 'editor' ? EditorLayout : SubscriberLayout;
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
@@ -19,7 +22,6 @@ export default function Create() {
         category: 'Perusahaan',
         description: '',
         benefit_details: '',
-        is_active: true,
         logo: null as File | null,
     });
 
@@ -102,7 +104,7 @@ export default function Create() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="benefit_details">Detail Manfaat Kerjasama (Opsional)</Label>
+                            <Label htmlFor="benefit_details">Detail Manfaat (untuk Alumni) <span className="text-red-500">*</span></Label>
                             <div className="prose max-w-none">
                                 <Editor
                                     value={data.benefit_details}
@@ -112,37 +114,22 @@ export default function Create() {
                             {errors.benefit_details && <p className="text-sm text-red-600">{errors.benefit_details}</p>}
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="logo">Logo Mitra (Opsional)</Label>
-                                <Input
-                                    id="logo"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setData('logo', e.target.files ? e.target.files[0] : null)}
-                                    className="cursor-pointer"
-                                />
-                                {errors.logo && <p className="text-sm text-red-600">{errors.logo}</p>}
-                            </div>
-
-                            <div className="flex items-center space-x-2 pt-8">
-                                <input
-                                    type="checkbox"
-                                    id="is_active"
-                                    checked={data.is_active}
-                                    onChange={(e) => setData('is_active', e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-600"
-                                />
-                                <Label htmlFor="is_active" className="cursor-pointer">Aktifkan Kemitraan Ini</Label>
-                            </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="logo">Logo Mitra (Opsional)</Label>
+                            <Input
+                                id="logo"
+                                type="file"
+                                onChange={(e) => setData('logo', e.target.files ? e.target.files[0] : null)}
+                                accept="image/*"
+                            />
+                            <p className="text-xs text-gray-500">
+                                Format: JPG, PNG. Maksimal 2MB.
+                            </p>
+                            {errors.logo && <p className="text-sm text-red-600">{errors.logo}</p>}
                         </div>
 
-                        <div className="flex items-center justify-end pt-6 border-t border-gray-100">
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                            >
+                        <div className="flex justify-end pt-6 border-t">
+                            <Button type="submit" disabled={processing} className="bg-emerald-600 hover:bg-emerald-700">
                                 <Save className="w-4 h-4 mr-2" />
                                 {processing ? 'Menyimpan...' : 'Simpan Mitra'}
                             </Button>

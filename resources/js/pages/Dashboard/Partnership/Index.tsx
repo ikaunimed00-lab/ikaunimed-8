@@ -3,16 +3,46 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
-import { Plus, Building2, Edit, Trash2, Eye, Globe } from 'lucide-react';
+import SubscriberLayout from '@/Layouts/SubscriberLayout';
+import { Plus, Building2, Edit, Trash2, Eye, Globe, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Index({ partnerships }: any) {
     const { auth }: any = usePage().props;
-    const Layout = auth.user.role === 'admin' ? AdminLayout : EditorLayout;
+    const userRole = auth.user.role;
+    const Layout = userRole === 'admin' ? AdminLayout : 
+                   userRole === 'editor' ? EditorLayout : SubscriberLayout;
 
     const handleDelete = (id: number) => {
         if (confirm('Apakah Anda yakin ingin menghapus mitra ini?')) {
             router.delete(route('dashboard.partnerships.destroy', id));
+        }
+    };
+
+    const handleApprove = (id: number) => {
+        if (confirm('Setujui kemitraan ini?')) {
+            router.post(route('dashboard.partnerships.approve', id));
+        }
+    };
+
+    const handleReject = (id: number) => {
+        if (confirm('Tolak kemitraan ini?')) {
+            router.post(route('dashboard.partnerships.reject', id));
+        }
+    };
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'active':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Aktif</span>;
+            case 'pending':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Menunggu</span>;
+            case 'rejected':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Ditolak</span>;
+            case 'closed':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Ditutup</span>;
+            default:
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{status}</span>;
         }
     };
 
@@ -77,12 +107,28 @@ export default function Index({ partnerships }: any) {
                                             ) : '-'}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                                                ${item.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                {item.is_active ? 'Aktif' : 'Non-Aktif'}
-                                            </span>
+                                            {getStatusBadge(item.status)}
                                         </td>
                                         <td className="px-6 py-4 text-right space-x-2">
+                                            {(userRole === 'admin' || userRole === 'editor') && item.status === 'pending' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleApprove(item.id)}
+                                                        className="inline-flex items-center p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+                                                        title="Setujui"
+                                                    >
+                                                        <CheckCircle className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(item.id)}
+                                                        className="inline-flex items-center p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                        title="Tolak"
+                                                    >
+                                                        <XCircle className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
+
                                             <a 
                                                 href={route('partnerships.show', item.slug)} 
                                                 target="_blank"
@@ -110,8 +156,8 @@ export default function Index({ partnerships }: any) {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                                        Belum ada data mitra.
+                                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                                        Belum ada data kemitraan.
                                     </td>
                                 </tr>
                             )}

@@ -3,16 +3,46 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
-import { Plus, GraduationCap, Calendar, Edit, Trash2, Eye } from 'lucide-react';
+import SubscriberLayout from '@/Layouts/SubscriberLayout';
+import { Plus, GraduationCap, Calendar, Edit, Trash2, Eye, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Index({ scholarships }: any) {
     const { auth }: any = usePage().props;
-    const Layout = auth.user.role === 'admin' ? AdminLayout : EditorLayout;
+    const userRole = auth.user.role;
+    const Layout = userRole === 'admin' ? AdminLayout : 
+                   userRole === 'editor' ? EditorLayout : SubscriberLayout;
 
     const handleDelete = (id: number) => {
         if (confirm('Apakah Anda yakin ingin menghapus beasiswa ini?')) {
             router.delete(route('dashboard.scholarships.destroy', id));
+        }
+    };
+
+    const handleApprove = (id: number) => {
+        if (confirm('Setujui beasiswa ini?')) {
+            router.post(route('dashboard.scholarships.approve', id));
+        }
+    };
+
+    const handleReject = (id: number) => {
+        if (confirm('Tolak beasiswa ini?')) {
+            router.post(route('dashboard.scholarships.reject', id));
+        }
+    };
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'active':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>;
+            case 'pending':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>;
+            case 'rejected':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Rejected</span>;
+            case 'closed':
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Closed</span>;
+            default:
+                return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{status}</span>;
         }
     };
 
@@ -77,10 +107,7 @@ export default function Index({ scholarships }: any) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                                                ${item.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                {item.status}
-                                            </span>
+                                            {getStatusBadge(item.status)}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center text-xs">
@@ -89,6 +116,25 @@ export default function Index({ scholarships }: any) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right space-x-2">
+                                            {(userRole === 'admin' || userRole === 'editor') && item.status === 'pending' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleApprove(item.id)}
+                                                        className="inline-flex items-center p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+                                                        title="Setujui"
+                                                    >
+                                                        <Check className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(item.id)}
+                                                        className="inline-flex items-center p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                        title="Tolak"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
+                                            
                                             <a 
                                                 href={route('scholarships.show', item.slug)} 
                                                 target="_blank"

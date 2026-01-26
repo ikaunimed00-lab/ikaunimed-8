@@ -102,10 +102,37 @@ export default function Edit({ news, authors, categories, authRole }: any) {
               </div>
             )}
 
-            {/* MAIN CONTENT SECTION */}
             <div className="grid grid-cols-3 gap-6">
               {/* LEFT: Editor */}
               <div className="col-span-2 space-y-6">
+
+                {/* ORGANIZATION SCOPE (Super Admin Only) */}
+                {organizations && organizations.length > 0 && (
+                    <div className="bg-white rounded-xl shadow p-6 space-y-3">
+                        <label className="block font-semibold text-slate-900">
+                            🏢 Scope Organisasi
+                        </label>
+                        <p className="text-sm text-slate-500 mb-2">
+                            Pilih organisasi pemilik berita ini. Kosongkan untuk berita Global/Publik.
+                        </p>
+                        <select
+                            value={data.organization_id}
+                            onChange={(e) => setData("organization_id", e.target.value)}
+                            className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                        >
+                            <option value="">-- Global / Publik (PP) --</option>
+                            {organizations.map((org: any) => (
+                                <option key={org.id} value={org.id}>
+                                    {org.name} ({org.type.toUpperCase()})
+                                </option>
+                            ))}
+                        </select>
+                        {errors.organization_id && (
+                            <p className="text-red-500 text-xs mt-1">{errors.organization_id}</p>
+                        )}
+                    </div>
+                )}
+
                 {/* JUDUL */}
                 <div className="bg-white rounded-xl shadow p-6 space-y-3">
                   <label className="block font-semibold text-slate-900">

@@ -14,6 +14,12 @@ interface NewsCardProps {
   author?: {
     name: string;
   };
+  organization?: {
+    id: number;
+    name: string;
+    type: 'pp' | 'dpw' | 'dpc';
+    slug: string;
+  };
   categories?: Array<{
     name: string;
     slug: string;
@@ -29,6 +35,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
   view_count,
   published_at,
   author,
+  organization,
   categories,
   size = 'md',
 }) => {
@@ -50,6 +57,12 @@ const NewsCard: React.FC<NewsCardProps> = ({
   };
 
   const imgUrl = getImageUrl(image);
+
+  const badgeColor = {
+    pp: "bg-indigo-100 text-indigo-700",
+    dpw: "bg-emerald-100 text-emerald-700",
+    dpc: "bg-sky-100 text-sky-700",
+  };
 
   return (
     <Link href={`/news/${slug}`}>
@@ -82,19 +95,26 @@ const NewsCard: React.FC<NewsCardProps> = ({
           
           {/* Badge Kategori di corner */}
           {categories && categories.length > 0 && (
-            <div className="absolute top-3 left-3 bg-[#0F766E] text-white px-2 py-1 rounded text-xs font-semibold">
+            <div className="absolute top-3 left-3 bg-[#0F766E] text-white px-2 py-1 rounded text-xs font-semibold z-10">
               {categories[0].name}
             </div>
           )}
           
           {/* View count badge */}
-          <div className="absolute top-3 right-3 bg-black/60 text-white px-2 py-1 rounded text-xs font-medium">
+          <div className="absolute top-3 right-3 bg-black/60 text-white px-2 py-1 rounded text-xs font-medium z-10">
             👁️ {view_count.toLocaleString()}
           </div>
         </div>
 
         {/* Content */}
         <div className="p-4 sm:p-5">
+          {/* Organization Badge */}
+          {organization && (
+             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium mb-2 ${badgeColor[organization.type.toLowerCase() as keyof typeof badgeColor] ?? "bg-slate-100 text-slate-700"}`}>
+               {organization.type.toUpperCase()} {organization.name}
+             </span>
+          )}
+
           {/* Kategori di content */}
           {categories && categories.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2">

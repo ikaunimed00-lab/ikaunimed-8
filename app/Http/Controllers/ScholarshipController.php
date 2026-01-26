@@ -11,7 +11,7 @@ class ScholarshipController extends Controller
     public function index(Request $request)
     {
         $query = Scholarship::query()
-            ->where('status', 'open')
+            ->where('status', 'active')
             ->when($request->search, function ($q, $search) {
                 $q->where('title', 'like', "%{$search}%")
                   ->orWhere('provider', 'like', "%{$search}%");
@@ -29,11 +29,11 @@ class ScholarshipController extends Controller
 
     public function show(Scholarship $scholarship)
     {
-        if ($scholarship->status !== 'open' && !auth()->user()?->isAdminOrEditor()) {
+        if ($scholarship->status !== 'active' && !auth()->user()?->isAdminOrEditor()) {
             abort(404);
         }
 
-        $related = Scholarship::where('status', 'open')
+        $related = Scholarship::where('status', 'active')
             ->where('id', '!=', $scholarship->id)
             ->where('degree', $scholarship->degree)
             ->limit(3)

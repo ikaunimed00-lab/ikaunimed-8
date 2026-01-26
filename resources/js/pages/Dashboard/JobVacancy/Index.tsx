@@ -4,7 +4,7 @@ import { route } from 'ziggy-js';
 import AdminLayout from '@/Layouts/AdminLayout';
 import EditorLayout from '@/Layouts/EditorLayout';
 import SubscriberLayout from '@/Layouts/SubscriberLayout';
-import { Plus, Briefcase, MapPin, Calendar, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Briefcase, MapPin, Calendar, Edit, Trash2, Eye, Check, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Index({ vacancies, userRole }: any) {
@@ -14,6 +14,18 @@ export default function Index({ vacancies, userRole }: any) {
     const handleDelete = (id: number) => {
         if (confirm('Apakah Anda yakin ingin menghapus lowongan ini?')) {
             router.delete(route('dashboard.jobs.destroy', id));
+        }
+    };
+
+    const handleApprove = (id: number) => {
+        if (confirm('Setujui lowongan kerja ini?')) {
+            router.post(route('dashboard.jobs.approve', id));
+        }
+    };
+
+    const handleReject = (id: number) => {
+        if (confirm('Tolak lowongan kerja ini?')) {
+            router.post(route('dashboard.jobs.reject', id));
         }
     };
 
@@ -82,8 +94,11 @@ export default function Index({ vacancies, userRole }: any) {
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
                                                 ${job.status === 'active' ? 'bg-green-100 text-green-800' : 
                                                   job.status === 'closed' ? 'bg-red-100 text-red-800' : 
+                                                  job.status === 'rejected' ? 'bg-gray-100 text-gray-800' :
                                                   'bg-yellow-100 text-yellow-800'}`}>
-                                                {job.status}
+                                                {job.status === 'rejected' ? 'Ditolak' : 
+                                                 job.status === 'active' ? 'Aktif' :
+                                                 job.status === 'closed' ? 'Ditutup' : 'Menunggu'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
@@ -93,6 +108,25 @@ export default function Index({ vacancies, userRole }: any) {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right space-x-2">
+                                            {(userRole === 'admin' || userRole === 'editor') && job.status === 'pending' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleApprove(job.id)}
+                                                        className="inline-flex items-center p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+                                                        title="Setujui"
+                                                    >
+                                                        <Check className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleReject(job.id)}
+                                                        className="inline-flex items-center p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                        title="Tolak"
+                                                    >
+                                                        <XCircle className="w-4 h-4" />
+                                                    </button>
+                                                </>
+                                            )}
+                                            
                                             <a 
                                                 href={route('jobs.show', job.slug)} 
                                                 target="_blank"

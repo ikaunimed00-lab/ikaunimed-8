@@ -20,6 +20,8 @@ class News extends Model
         'slug',
         'image',
         'status',
+        'scope_type',
+        'organization_id',
         'published_at',
         'view_count',
         'user_id',
@@ -52,6 +54,30 @@ class News extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Relasi ke organisasi
+     */
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    /**
+     * Scope: berita organisasi tertentu
+     */
+    public function scopeOrganization($query, $orgId)
+    {
+        return $query->where('scope_type', 'internal')->where('organization_id', $orgId);
+    }
+
+    /**
+     * Scope: berita publik (tidak terikat organisasi atau scope_type=public)
+     */
+    public function scopePublicScope($query)
+    {
+        return $query->where('scope_type', 'public');
     }
 
     /**

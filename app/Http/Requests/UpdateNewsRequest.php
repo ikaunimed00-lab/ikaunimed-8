@@ -57,6 +57,7 @@ class UpdateNewsRequest extends FormRequest
                 'max:3',
             ],
             'categories.*' => 'required|integer|exists:categories,id',
+            'organization_id' => 'nullable|exists:organizations,id',
             'published_at' => 'nullable|date_format:Y-m-d\TH:i',
             'status' => 'required|in:draft,scheduled,published',
         ];

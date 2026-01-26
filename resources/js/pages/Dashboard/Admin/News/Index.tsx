@@ -3,7 +3,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { useState } from "react";
-import { ArrowLeft, FileText, Plus } from "lucide-react";
+import { ArrowLeft, FileText, Plus, Building2 } from "lucide-react";
 
 export default function Index({ news, filters }: any) {
     const { flash, auth }: any = usePage().props;

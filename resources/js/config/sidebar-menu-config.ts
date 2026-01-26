@@ -18,6 +18,7 @@ import {
     Briefcase,
     GraduationCap,
     Handshake,
+    Building2,
 } from "lucide-react";
 
 export type UserRole = "admin" | "editor" | "writer" | "subscriber";
@@ -83,6 +84,12 @@ export const SIDEBAR_MENU: MenuItem[] = [
     },
 
     // === USER MANAGEMENT ===
+    {
+        title: "Kelola Organisasi",
+        route: "dashboard.admin.organizations.index",
+        icon: Building2,
+        roles: ["admin"],
+    },
     {
         title: "Kelola User",
         route: "admin.users.index",

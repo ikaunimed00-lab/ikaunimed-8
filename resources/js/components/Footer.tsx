@@ -25,6 +25,7 @@ const Footer = () => {
     organisasi: [
       { label: "Tentang IKA UNIMED", href: "/tentang-kami" },
       { label: "Struktur Organisasi", href: "/struktur-organisasi" },
+      { label: "Direktori Organisasi", href: "/organisasi" },
       { label: "Hubungi Kami & Sekretariat", href: "/hubungi-kami" },
       { label: "Donasi", href: "/donasi" },
       { label: "Syarat & Ketentuan", href: "/syarat-ketentuan" },

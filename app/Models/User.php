@@ -16,6 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'organization_id',
         'oauth_id',
         'oauth_provider',
 
@@ -77,6 +78,35 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /**
+     * Relasi ke organisasi
+     */
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    /**
+     * Cek apakah user adalah Admin Pusat (Super Admin)
+     */
+    public function isCentralAdmin(): bool
+    {
+        // Admin tanpa organisasi dianggap Pusat
+        // Atau jika organisasi tipe 'pp'
+        return $this->isAdmin() && (
+            is_null($this->organization_id) || 
+            ($this->organization && $this->organization->type === 'pp')
+        );
+    }
+
+    /**
+     * Cek apakah user terikat scope organisasi tertentu
+     */
+    public function hasOrganizationScope(): bool
+    {
+        return !is_null($this->organization_id);
     }
 
     public function legalizations()

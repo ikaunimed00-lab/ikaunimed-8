@@ -1,7 +1,8 @@
 import { Head, router, usePage, Link } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { useState } from "react";
-import { Trash2, ArrowLeft, Users, Shield, Mail, Trash } from "lucide-react";
+import { Trash2, ArrowLeft, Users, Mail, Trash, Edit, Building2 } from "lucide-react";
+import { routeName } from "@/config/sidebar-menu-config";
 
 export default function UsersIndex({ users }) {
     const { flash, auth }: any = usePage().props;
@@ -9,25 +10,6 @@ export default function UsersIndex({ users }) {
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
-
-    /**
-     * ROUTE DASHBOARD BERDASARKAN ROLE
-     * (SEMUA ROUTE INI SUDAH TERBUKTI ADA)
-     */
-    const dashboardRoute = (() => {
-        switch (auth.user.role) {
-            case "admin":
-                return route("dashboard.admin");
-            case "editor":
-                return route("dashboard.editor");
-            case "writer":
-                return route("dashboard.writer");
-            case "subscriber":
-                return route("dashboard.subscriber");
-            default:
-                return route("home");
-        }
-    })();
 
     const toggleSelectUser = (id: number) => {
         setSelectedIds(prev =>
@@ -50,6 +32,7 @@ export default function UsersIndex({ users }) {
 
     const confirmDelete = () => {
         if (deleteTargetId) {
+            // @ts-ignore
             router.delete(route("admin.users.destroy", deleteTargetId), {
                 onSuccess: () => {
                     setShowDeleteConfirm(false);
@@ -67,6 +50,7 @@ export default function UsersIndex({ users }) {
         }
 
         router.post(
+            // @ts-ignore
             route("admin.users.bulk-delete"),
             { ids: selectedIds },
             { onSuccess: () => setSelectedIds([]) }
@@ -86,31 +70,24 @@ export default function UsersIndex({ users }) {
         }
     };
 
-    const updateRole = (userId: number, role: string) => {
-        router.put(
-            route("admin.users.update", userId),
-            { role },
-            { preserveScroll: true }
-        );
-    };
-
     return (
         <AdminLayout>
             <Head title="Kelola User" />
 
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-50 to-blue-50 py-8 px-4 md:px-8">
                 <div className="max-w-6xl mx-auto">
-                {/* HEADER */}
-                <div className="mb-10">
-                    <Link
-                        href={route('dashboard.admin')}
-                        className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 font-semibold transition-colors mb-4 group"
-                    >
-                        <div className="p-2 bg-white rounded-full shadow-sm group-hover:shadow-md transition-all">
-                            <ArrowLeft className="h-4 w-4" />
-                        </div>
-                        Kembali ke Dashboard
-                    </Link>
+                    {/* HEADER */}
+                    <div className="mb-10">
+                        <Link
+                            // @ts-ignore
+                            href={route('dashboard.admin')}
+                            className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 font-semibold transition-colors mb-4 group"
+                        >
+                            <div className="p-2 bg-white rounded-full shadow-sm group-hover:shadow-md transition-all">
+                                <ArrowLeft className="h-4 w-4" />
+                            </div>
+                            Kembali ke Dashboard
+                        </Link>
 
                         <div className="flex items-center gap-4 mb-2">
                             <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
@@ -173,12 +150,12 @@ export default function UsersIndex({ users }) {
                                         </th>
                                         <th className="px-6 py-4 text-left">Nama</th>
                                         <th className="px-6 py-4 text-left">Email</th>
-                                        <th className="px-6 py-4 text-center">Role</th>
+                                        <th className="px-6 py-4 text-center">Role / Organisasi</th>
                                         <th className="px-6 py-4 text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y">
-                                    {users.map(user => {
+                                    {users.map((user: any) => {
                                         const roleColor = getRoleColor(user.role);
                                         return (
                                             <tr key={user.id}>
@@ -197,27 +174,36 @@ export default function UsersIndex({ users }) {
                                                     {user.email}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <select
-                                                        value={user.role}
-                                                        onChange={e =>
-                                                            updateRole(user.id, e.target.value)
-                                                        }
-                                                        className={`px-3 py-2 rounded ${roleColor.bg} ${roleColor.text}`}
-                                                    >
-                                                        <option value="subscriber">Subscriber</option>
-                                                        <option value="writer">Writer</option>
-                                                        <option value="editor">Editor</option>
-                                                        <option value="admin">Admin</option>
-                                                    </select>
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${roleColor.bg} ${roleColor.text}`}>
+                                                            {user.role.toUpperCase()}
+                                                        </span>
+                                                        {user.organization && (
+                                                            <span className="text-xs font-medium text-slate-500 flex items-center gap-1">
+                                                                <Building2 className="w-3 h-3" />
+                                                                {user.organization.name}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <button
-                                                        onClick={() => deleteUser(user.id)}
-                                                        className="text-red-600 hover:underline flex items-center gap-1 justify-center"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                        Hapus
-                                                    </button>
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <Link
+                                                            // @ts-ignore
+                                                            href={route("admin.users.edit", user.id)}
+                                                            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-blue-600 transition-colors"
+                                                            title="Edit Access"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => deleteUser(user.id)}
+                                                            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-red-600 transition-colors"
+                                                            title="Hapus User"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );

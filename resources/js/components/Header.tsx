@@ -30,6 +30,7 @@ const Header = () => {
       items: [
         { title: "Tentang IKA UNIMED", href: "/tentang-kami", description: "Sejarah dan profil Ikatan Alumni." },
         { title: "Struktur Organisasi", href: "/struktur-organisasi", description: "Susunan pengurus IKA UNIMED." },
+        { title: "Organisasi", href: "/organisasi", description: "Direktori PP, DPW, dan DPC IKA UNIMED." },
         { title: "Visi & Misi", href: "/tentang-kami", description: "Arah dan tujuan organisasi." },
       ]
     },

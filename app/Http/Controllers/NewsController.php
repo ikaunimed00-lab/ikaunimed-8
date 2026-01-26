@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\News;
 use App\Models\User;
+use App\Models\Organization;
 use App\Models\Category;
 use App\Models\Legalization;
 use App\Http\Requests\StoreNewsRequest;
@@ -199,6 +200,11 @@ class NewsController extends Controller
             $query->where('user_id', $user->id);
         }
 
+        // Filter by organization (Phase 2: User Assignment)
+        if ($user->organization_id) {
+            $query->where('organization_id', $user->organization_id);
+        }
+
         // Search filter
         if ($request->search) {
             $query->where('title', 'like', '%' . $request->search . '%');
@@ -210,7 +216,7 @@ class NewsController extends Controller
         }
 
         $news = $query
-            ->with('author:id,name', 'categories:id,name')
+            ->with('author:id,name', 'categories:id,name', 'organization:id,name,type')
             ->latest('published_at', 'desc')
             ->latest('created_at', 'desc')
             ->paginate(15)
@@ -224,6 +230,10 @@ class NewsController extends Controller
                 'created_at' => $item->created_at?->toISOString(),
                 'view_count' => $item->view_count,
                 'author' => ['name' => $item->author?->name],
+                'organization' => $item->organization ? [
+                    'name' => $item->organization->name,
+                    'type' => $item->organization->type,
+                ] : null,
                 'categories' => $item->categories->pluck('name')->toArray(),
             ]);
 
@@ -268,6 +278,9 @@ class NewsController extends Controller
                 ->orderBy('order')
                 ->orderBy('name')
                 ->get(),
+            'organizations' => ($user->isAdmin() && !$user->organization_id) 
+                ? Organization::select('id', 'name', 'type')->orderBy('name')->get() 
+                : [],
         ]);
     }
 
@@ -282,6 +295,15 @@ class NewsController extends Controller
         $validated['user_id'] = $user->isAdmin() && $request->user_id
             ? $request->user_id
             : $user->id;
+
+        // Organization Logic (Phase 2)
+        if ($user->organization_id) {
+            // User terikat organisasi -> force organization_id
+            $validated['organization_id'] = $user->organization_id;
+        } elseif ($user->isAdmin() && $request->organization_id) {
+            // Super Admin bisa pilih organisasi (titipan)
+            $validated['organization_id'] = $request->organization_id;
+        }
 
         // Auto-publish logic
         if ($request->status === 'published' && !$validated['published_at']) {
@@ -368,6 +390,16 @@ class NewsController extends Controller
         // Allow admin to change author
         if ($user->isAdmin() && $request->user_id) {
             $validated['user_id'] = $request->user_id;
+        }
+
+        // Organization Logic (Phase 2)
+        if ($user->organization_id) {
+            // User terikat organisasi -> tidak bisa ubah organization_id
+            unset($validated['organization_id']);
+        } elseif ($user->isAdmin()) {
+            // Super Admin bisa ubah organisasi
+            // Jika organization_id tidak dikirim (null), artinya jadi global
+            $validated['organization_id'] = $request->input('organization_id');
         }
 
         // Handle published_at

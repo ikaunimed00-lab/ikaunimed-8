@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,7 +21,8 @@ class UserController extends Controller
     {
         $this->ensureAdmin();
 
-        $users = User::select('id', 'name', 'email', 'role')
+        $users = User::with('organization:id,name,type')
+            ->select('id', 'name', 'email', 'role', 'organization_id')
             ->orderBy('name')
             ->get();
 
@@ -29,19 +31,28 @@ class UserController extends Controller
         ]);
     }
 
+    public function edit(User $user)
+    {
+        $this->ensureAdmin();
+
+        return Inertia::render('Dashboard/Admin/Users/Edit', [
+            'user' => $user->load('organization'),
+            'organizations' => Organization::select('id', 'name', 'type')->orderBy('name')->get(),
+        ]);
+    }
+
     public function update(Request $request, User $user)
     {
         $this->ensureAdmin();
 
-        $request->validate([
+        $validated = $request->validate([
             'role' => 'required|in:subscriber,writer,editor,admin',
+            'organization_id' => 'nullable|exists:organizations,id',
         ]);
 
-        $user->update([
-            'role' => $request->role,
-        ]);
+        $user->update($validated);
 
-        return back()->with('success', 'Role user berhasil diperbarui.');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
     }
 
     public function destroy(User $user)

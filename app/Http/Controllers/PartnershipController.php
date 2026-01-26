@@ -11,7 +11,7 @@ class PartnershipController extends Controller
     public function index(Request $request)
     {
         $query = Partnership::query()
-            ->where('is_active', true)
+            ->where('status', 'active')
             ->when($request->search, function ($q, $search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
@@ -29,7 +29,7 @@ class PartnershipController extends Controller
 
     public function show(Partnership $partnership)
     {
-        if (!$partnership->is_active && !auth()->user()?->isAdminOrEditor()) {
+        if ($partnership->status !== 'active' && !auth()->user()?->isEditor()) {
             abort(404);
         }
 
