@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 class CategorySeeder extends Seeder
 {
@@ -74,5 +75,8 @@ class CategorySeeder extends Seeder
                 $category
             );
         }
+
+        // Clear cache agar perubahan langsung muncul di halaman publik
+        Cache::forget('categories.all');
     }
 }

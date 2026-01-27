@@ -374,6 +374,9 @@ class NewsController extends Controller
                 ->orderBy('order')
                 ->orderBy('name')
                 ->get(),
+            'organizations' => ($user->isAdmin() && !$user->organization_id)
+                ? Organization::select('id', 'name', 'type')->orderBy('name')->get()
+                : [],
         ]);
     }
 
