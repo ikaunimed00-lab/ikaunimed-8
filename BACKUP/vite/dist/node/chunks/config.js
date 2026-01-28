@@ -22325,7 +22325,7 @@ function build_default(dir, opts = {}) {
 	let isSPA = !!opts.single;
 	if (typeof opts.single === "string") {
 		let idx = opts.single.lastIndexOf(".");
-		fallback += !!~idx ? opts.single.substring(0, idx) : opts.single;
+		fallback += ~idx ? opts.single.substring(0, idx) : opts.single;
 	}
 	let ignores = [];
 	if (opts.ignores !== false) {
@@ -23323,7 +23323,7 @@ function preload(baseModule, deps, importerUrl) {
 			seen[dep] = true;
 			const isCss = dep.endsWith(".css");
 			const cssSelector = isCss ? "[rel=\"stylesheet\"]" : "";
-			if (!!importerUrl) for (let i$1 = links.length - 1; i$1 >= 0; i$1--) {
+			if (importerUrl) for (let i$1 = links.length - 1; i$1 >= 0; i$1--) {
 				const link$1 = links[i$1];
 				if (link$1.href === dep && (!isCss || link$1.rel === "stylesheet")) return;
 			}

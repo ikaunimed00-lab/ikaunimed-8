@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { formatNumber } from '@/lib/utils';
 
 interface HeroNewsProps {
   id: number;
@@ -63,7 +64,7 @@ const HeroNews: React.FC<HeroNewsProps> = ({
                 </span>
               )}
               <span className="bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
-                👁️ {view_count.toLocaleString()} Views
+                👁️ {formatNumber(view_count)} Views
               </span>
             </div>
 

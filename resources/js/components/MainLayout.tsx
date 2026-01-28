@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import Header from './Header';
+import { HeaderEnterprise as Header } from './navigation/HeaderEnterprise';
 import Footer from './Footer';
 
 interface MainLayoutProps {

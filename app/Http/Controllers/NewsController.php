@@ -52,7 +52,44 @@ class NewsController extends Controller
                 ]);
         });
 
-        return Inertia::render('News/Index', compact('news'));
+        // Latest Videos for FlashContent
+        $latestVideos = Cache::remember('news.latest_videos', 60 * 15, function () {
+            return News::published()
+                ->whereNotNull('video_urls')
+                ->where('video_urls', '!=', '[]')
+                ->latest('published_at')
+                ->take(10)
+                ->get()
+                ->map(fn ($item) => [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'slug' => $item->slug,
+                    'image' => $item->image ? Storage::url('news/' . $item->image) : null,
+                    'video_urls' => $item->video_urls,
+                    'published_at' => $item->published_at?->toISOString(),
+                ]);
+        });
+
+        // Popular Videos for VideoPopular
+        $popularVideos = Cache::remember('news.popular_videos', 60 * 15, function () {
+            return News::published()
+                ->whereNotNull('video_urls')
+                ->where('video_urls', '!=', '[]')
+                ->orderBy('view_count', 'desc')
+                ->take(6)
+                ->get()
+                ->map(fn ($item) => [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'slug' => $item->slug,
+                    'image' => $item->image ? Storage::url('news/' . $item->image) : null,
+                    'video_urls' => $item->video_urls,
+                    'view_count' => $item->view_count,
+                    'published_at' => $item->published_at?->toISOString(),
+                ]);
+        });
+
+        return Inertia::render('News/Index', compact('news', 'latestVideos', 'popularVideos'));
     }
 
     public function show(News $news)
@@ -64,7 +101,7 @@ class NewsController extends Controller
         $news->incrementViewCount();
 
         // Load relasi
-        $news->load('author:id,name', 'categories:id,slug,name');
+        $news->load('author:id,name', 'categories:id,slug,name', 'organization:id,name,slug,type');
 
         // Get related news (cached)
         $relatedNews = Cache::remember(
@@ -90,6 +127,7 @@ class NewsController extends Controller
                 'excerpt' => $news->excerpt,
                 'slug' => $news->slug,
                 'image' => $news->image ? Storage::url('news/' . $news->image) : null,
+                'video_urls' => $news->video_urls,
                 'view_count' => $news->view_count,
                 'published_at' => $news->published_at?->toISOString(),
                 'created_at' => $news->created_at?->toISOString(),
@@ -102,8 +140,105 @@ class NewsController extends Controller
                     'name' => $c->name,
                     'slug' => $c->slug,
                 ])->toArray(),
+                'organization' => $news->organization ? [
+                    'name' => $news->organization->name,
+                    'slug' => $news->organization->slug,
+                    'type' => $news->organization->type,
+                ] : null,
             ],
             'relatedNews' => $relatedNews,
+        ]);
+    }
+
+    /**
+     * Halaman Berita Organisasi
+     * Route: /news/organisasi/{scope}/{slug?}
+     */
+    public function organization(Request $request, $scope, $slug = null)
+    {
+        $query = News::published()
+            ->where('type', 'organization')
+            ->where('scope_level', $scope);
+
+        if ($slug) {
+            // Jika ada slug, filter by organization slug
+            $query->whereHas('organization', fn($q) => $q->where('slug', $slug));
+        }
+
+        $news = $query->with('author:id,name', 'categories:id,slug,name', 'organization:id,name,slug')
+            ->latest('published_at')
+            ->paginate(12)
+            ->through(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'excerpt' => $item->excerpt,
+                'slug' => $item->slug,
+                'image' => $item->image ? Storage::url('news/' . $item->image) : null,
+                'view_count' => $item->view_count,
+                'author' => ['name' => $item->author?->name],
+                'organization' => $item->organization ? [
+                    'name' => $item->organization->name,
+                    'slug' => $item->organization->slug,
+                ] : null,
+                'categories' => $item->categories->map(fn($c) => [
+                    'name' => $c->name,
+                    'slug' => $c->slug,
+                ])->toArray(),
+                'published_at' => $item->published_at?->toISOString(),
+            ]);
+
+        return Inertia::render('News/Organization', [
+            'news' => $news,
+            'scope' => $scope,
+            'orgSlug' => $slug,
+        ]);
+    }
+
+    /**
+     * Halaman Media Foto (Agregasi)
+     * Route: /media/foto
+     */
+    public function mediaPhotos(Request $request)
+    {
+        $photos = News::published()
+            ->whereNotNull('image')
+            ->latest('published_at')
+            ->paginate(20)
+            ->through(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'slug' => $item->slug,
+                'image' => Storage::url('news/' . $item->image),
+                'published_at' => $item->published_at?->toISOString(),
+            ]);
+
+        return Inertia::render('Media/Photos', [
+            'photos' => $photos,
+        ]);
+    }
+
+    /**
+     * Halaman Media Video (Agregasi)
+     * Route: /media/video
+     */
+    public function mediaVideos(Request $request)
+    {
+        $videos = News::published()
+            ->whereNotNull('video_urls')
+            ->where('video_urls', '!=', '[]') // Ensure not empty json array
+            ->latest('published_at')
+            ->paginate(12)
+            ->through(fn ($item) => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'slug' => $item->slug,
+                'image' => $item->image ? Storage::url('news/' . $item->image) : null,
+                'video_urls' => $item->video_urls,
+                'published_at' => $item->published_at?->toISOString(),
+            ]);
+
+        return Inertia::render('Media/Videos', [
+            'videos' => $videos,
         ]);
     }
 
@@ -305,6 +440,16 @@ class NewsController extends Controller
             $validated['organization_id'] = $request->organization_id;
         }
 
+        // Set type and scope_level based on organization_id
+        if (!empty($validated['organization_id'])) {
+            $validated['type'] = 'organization';
+            $org = Organization::find($validated['organization_id']);
+            $validated['scope_level'] = $org ? $org->type : null;
+        } else {
+            $validated['type'] = 'public';
+            $validated['scope_level'] = null;
+        }
+
         // Auto-publish logic
         if ($request->status === 'published' && !$validated['published_at']) {
             $validated['published_at'] = now();
@@ -360,6 +505,7 @@ class NewsController extends Controller
                 'excerpt' => $news->excerpt,
                 'content' => $news->content,
                 'image' => $news->image ? Storage::url('news/' . $news->image) : null,
+                'video_urls' => $news->video_urls,
                 'slug' => $news->slug,
                 'user_id' => $news->user_id,
                 'status' => $news->status,
@@ -399,10 +545,26 @@ class NewsController extends Controller
         if ($user->organization_id) {
             // User terikat organisasi -> tidak bisa ubah organization_id
             unset($validated['organization_id']);
+            // Keep existing type/scope logic (handled by store usually, but if update needs re-check?)
+            // Usually organization doesn't change for user.
         } elseif ($user->isAdmin()) {
             // Super Admin bisa ubah organisasi
             // Jika organization_id tidak dikirim (null), artinya jadi global
             $validated['organization_id'] = $request->input('organization_id');
+        }
+
+        // Recalculate type/scope if organization_id is present in validated (meaning it might have changed)
+        // Or if we need to enforce consistency.
+        // For admin update, organization_id might be set or null.
+        if (array_key_exists('organization_id', $validated)) {
+             if (!empty($validated['organization_id'])) {
+                $validated['type'] = 'organization';
+                $org = Organization::find($validated['organization_id']);
+                $validated['scope_level'] = $org ? $org->type : null;
+            } else {
+                $validated['type'] = 'public';
+                $validated['scope_level'] = null;
+            }
         }
 
         // Handle published_at

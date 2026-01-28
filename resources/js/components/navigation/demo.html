@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IKA UNIMED - Header Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f9fafb;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { 
+            Menu, X, ChevronDown, ChevronRight, Home, Info, Users, 
+            Briefcase, FileCheck, Newspaper, Building2, Target, Network, 
+            CalendarDays, Heart, Vote, Search, Handshake, GraduationCap, 
+            Lightbulb, FileText, CreditCard, DollarSign, HelpCircle, 
+            Image, Video 
+        } = lucide;
+
+        // Menu Configuration
+        const menuConfig = [
+            {
+                id: 'home',
+                label: 'Home',
+                href: '/',
+                color: {
+                    main: '#0F766E',
+                    gradient: 'from-[#0F766E]/20 to-[#0F766E]/5',
+                    hover: 'hover:bg-[#0F766E]/10',
+                },
+                icon: Home,
+            },
+            {
+                id: 'tentang-ika',
+                label: 'Tentang IKA',
+                description: 'Mengenal lebih dekat Ikatan Alumni UNIMED',
+                icon: Info,
+                color: {
+                    main: '#0F766E',
+                    gradient: 'from-[#0F766E]/20 to-[#0F766E]/5',
+                    hover: 'hover:bg-[#0F766E]/10',
+                },
+                sections: [
+                    {
+                        id: 'profil-organisasi',
+                        title: 'Profil Organisasi',
+                        icon: Building2,
+                        items: [
+                            {
+                                title: 'Tentang IKA UNIMED',
+                                description: 'Sejarah dan perjalanan organisasi',
+                                href: '/tentang/profil',
+                                icon: Info,
+                            },
+                            {
+                                title: 'Visi & Misi',
+                                description: 'Tujuan dan arah organisasi',
+                                href: '/tentang/visi-misi',
+                                icon: Target,
+                            },
+                        ],
+                    },
+                    {
+                        id: 'struktur',
+                        title: 'Struktur',
+                        icon: Network,
+                        items: [
+                            {
+                                title: 'Struktur Organisasi',
+                                description: 'Susunan kepengurusan IKA',
+                                href: '/tentang/struktur',
+                                icon: Network,
+                            },
+                            {
+                                title: 'Organisasi (PP / DPW / DPC)',
+                                description: 'Jaringan organisasi di seluruh Indonesia',
+                                href: '/tentang/organisasi',
+                                icon: Building2,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'komunitas-alumni',
+                label: 'Komunitas Alumni',
+                description: 'Terhubung dan berkontribusi bersama sesama alumni',
+                icon: Users,
+                color: {
+                    main: '#37D67A',
+                    gradient: 'from-[#37D67A]/25 to-[#37D67A]/10',
+                    hover: 'hover:bg-[#37D67A]/10',
+                },
+                sections: [
+                    {
+                        id: 'berita-kegiatan',
+                        title: 'Berita & Kegiatan',
+                        icon: CalendarDays,
+                        items: [
+                            {
+                                title: 'Kabar Alumni',
+                                description: 'Berita dan informasi terkini alumni',
+                                href: '/komunitas/kabar',
+                                icon: Newspaper,
+                            },
+                            {
+                                title: 'Agenda',
+                                description: 'Jadwal kegiatan dan acara mendatang',
+                                href: '/komunitas/agenda',
+                                icon: CalendarDays,
+                            },
+                        ],
+                    },
+                    {
+                        id: 'kontribusi',
+                        title: 'Kontribusi',
+                        icon: Heart,
+                        items: [
+                            {
+                                title: 'Ruang Pengabdian',
+                                description: 'Berkontribusi untuk sesama alumni',
+                                href: '/komunitas/pengabdian',
+                                icon: Heart,
+                            },
+                            {
+                                title: 'E-Voting',
+                                description: 'Partisipasi dalam keputusan organisasi',
+                                href: '/komunitas/voting',
+                                icon: Vote,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'karir-pengembangan',
+                label: 'Karir & Pengembangan',
+                description: 'Peluang karir dan pengembangan kompetensi',
+                icon: Briefcase,
+                color: {
+                    main: '#E9CF35',
+                    gradient: 'from-[#E9CF35]/25 to-[#E9CF35]/10',
+                    hover: 'hover:bg-[#E9CF35]/15',
+                    iconClass: 'text-gray-800',
+                },
+                sections: [
+                    {
+                        id: 'peluang-karir',
+                        title: 'Peluang Karir',
+                        icon: Search,
+                        items: [
+                            {
+                                title: 'Lowongan Kerja',
+                                description: 'Temukan peluang karir terbaru',
+                                href: '/karir/lowongan',
+                                icon: Search,
+                            },
+                            {
+                                title: 'Kemitraan',
+                                description: 'Jalin kerjasama strategis',
+                                href: '/karir/kemitraan',
+                                icon: Handshake,
+                            },
+                        ],
+                    },
+                    {
+                        id: 'pengembangan-diri',
+                        title: 'Pengembangan Diri',
+                        icon: GraduationCap,
+                        items: [
+                            {
+                                title: 'Beasiswa',
+                                description: 'Program beasiswa untuk alumni',
+                                href: '/pengembangan/beasiswa',
+                                icon: GraduationCap,
+                            },
+                            {
+                                title: 'Micro Learning',
+                                description: 'Platform pembelajaran singkat',
+                                href: '/pengembangan/microlearning',
+                                icon: Lightbulb,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'layanan-alumni',
+                label: 'Layanan Alumni',
+                description: 'Layanan digital dan dukungan untuk alumni',
+                icon: FileCheck,
+                color: {
+                    main: '#085A18',
+                    gradient: 'from-[#085A18]/20 to-[#085A18]/5',
+                    hover: 'hover:bg-[#085A18]/10',
+                },
+                sections: [
+                    {
+                        id: 'layanan-digital',
+                        title: 'Layanan Digital',
+                        icon: FileText,
+                        items: [
+                            {
+                                title: 'Legalisir Ijazah',
+                                description: 'Layanan legalisir dokumen online',
+                                href: '/layanan/legalisir',
+                                icon: FileText,
+                            },
+                            {
+                                title: 'Kartu Alumni',
+                                description: 'Pendaftaran dan pengelolaan kartu',
+                                href: '/layanan/kartu-alumni',
+                                icon: CreditCard,
+                            },
+                        ],
+                    },
+                    {
+                        id: 'dukungan',
+                        title: 'Dukungan',
+                        icon: Heart,
+                        items: [
+                            {
+                                title: 'Donasi',
+                                description: 'Dukung kegiatan IKA UNIMED',
+                                href: '/layanan/donasi',
+                                icon: DollarSign,
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'berita',
+                label: 'Berita',
+                description: 'Informasi terkini dan galeri media',
+                icon: Newspaper,
+                color: {
+                    main: '#64748B',
+                    gradient: 'from-slate-200 to-slate-50',
+                    hover: 'hover:bg-slate-100',
+                },
+                sections: [
+                    {
+                        id: 'berita-update',
+                        title: 'Berita & Update',
+                        icon: Newspaper,
+                        items: [
+                            {
+                                title: 'Berita Terkini',
+                                description: 'Update terbaru seputar UNIMED',
+                                href: '/berita/terkini',
+                                icon: Newspaper,
+                            },
+                            {
+                                title: 'FAQ',
+                                description: 'Pertanyaan yang sering diajukan',
+                                href: '/berita/faq',
+                                icon: HelpCircle,
+                            },
+                        ],
+                    },
+                    {
+                        id: 'media',
+                        title: 'Media',
+                        icon: Image,
+                        items: [
+                            {
+                                title: 'Galeri Foto',
+                                description: 'Dokumentasi foto kegiatan',
+                                href: '/berita/galeri-foto',
+                                icon: Image,
+                            },
+                            {
+                                title: 'Galeri Video',
+                                description: 'Dokumentasi video kegiatan',
+                                href: '/berita/galeri-video',
+                                icon: Video,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ];
+
+        // MegaMenu Component
+        const MegaMenu = ({ item, isOpen, onClose }) => {
+            if (!item.sections || item.sections.length === 0) return null;
+
+            const Icon = item.icon;
+
+            return (
+                <div
+                    className={`
+                        absolute left-0 top-full mt-2 w-full
+                        transition-all duration-200 ease-out
+                        ${isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}
+                    `}
+                >
+                    <div className="flex justify-center px-4">
+                        <div
+                            className="
+                                bg-white rounded-2xl shadow-2xl
+                                border border-gray-100
+                                overflow-hidden
+                                w-full max-w-4xl
+                            "
+                            style={{ maxWidth: '56rem' }}
+                        >
+                            {/* Header */}
+                            <div className={`px-6 py-5 bg-gradient-to-r ${item.color.gradient} border-b border-gray-100`}>
+                                <div className="flex items-start gap-3">
+                                    {Icon && (
+                                        <div
+                                            className={`p-2.5 rounded-xl ${item.color.iconClass || 'text-white'} transition-transform duration-200`}
+                                            style={{ backgroundColor: item.color.main }}
+                                        >
+                                            <Icon size={24} strokeWidth={2} />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-1" style={{ color: item.color.main }}>
+                                            {item.label}
+                                        </h3>
+                                        {item.description && (
+                                            <p className="text-sm text-gray-600 leading-relaxed">{item.description}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Content Grid */}
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-6 p-6">
+                                {item.sections.map((section) => {
+                                    const SectionIcon = section.icon;
+                                    return (
+                                        <div key={section.id} className="space-y-3">
+                                            <div className="flex items-center gap-2 mb-4">
+                                                {SectionIcon && (
+                                                    <SectionIcon size={16} style={{ color: item.color.main }} strokeWidth={2.5} />
+                                                )}
+                                                <h4 className="text-sm font-semibold uppercase tracking-wide" style={{ color: item.color.main }}>
+                                                    {section.title}
+                                                </h4>
+                                            </div>
+
+                                            <div className="space-y-1">
+                                                {section.items.map((menuItem) => {
+                                                    const ItemIcon = menuItem.icon;
+                                                    return (
+                                                        <a
+                                                            key={menuItem.href}
+                                                            href={menuItem.href}
+                                                            onClick={onClose}
+                                                            className={`group flex items-start gap-3 p-3 rounded-lg transition-all duration-150 ${item.color.hover}`}
+                                                        >
+                                                            {ItemIcon && (
+                                                                <div className="mt-0.5">
+                                                                    <ItemIcon
+                                                                        size={16}
+                                                                        className={`transition-transform duration-200 group-hover:scale-110 ${item.color.iconClass || ''}`}
+                                                                        style={{ color: item.color.main }}
+                                                                        strokeWidth={2}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <h5 className="text-sm font-semibold text-gray-900 group-hover:underline">
+                                                                        {menuItem.title}
+                                                                    </h5>
+                                                                    <ChevronRight size={14} className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                                                                </div>
+                                                                {menuItem.description && (
+                                                                    <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{menuItem.description}</p>
+                                                                )}
+                                                            </div>
+                                                        </a>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // MobileMenu Component
+        const MobileMenu = ({ isOpen, onClose, menuItems, currentPath = '/' }) => {
+            const [openSection, setOpenSection] = useState(null);
+
+            const toggleSection = (sectionId) => {
+                setOpenSection(openSection === sectionId ? null : sectionId);
+            };
+
+            return (
+                <>
+                    {/* Overlay */}
+                    <div
+                        className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                        onClick={onClose}
+                    />
+
+                    {/* Mobile Menu Panel */}
+                    <div
+                        className={`fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl z-50 lg:hidden transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+                            <h2 className="text-lg font-bold text-gray-900">Menu</h2>
+                            <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                                <X size={20} className="text-gray-600" />
+                            </button>
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="overflow-y-auto h-[calc(100vh-73px)]">
+                            <nav className="py-2">
+                                {menuItems.map((item) => {
+                                    const Icon = item.icon;
+                                    const isActive = currentPath === item.href;
+                                    const hasSubMenu = item.sections && item.sections.length > 0;
+                                    const isExpanded = openSection === item.id;
+
+                                    if (!hasSubMenu && item.href) {
+                                        return (
+                                            <a
+                                                key={item.id}
+                                                href={item.href}
+                                                onClick={onClose}
+                                                className={`flex items-center gap-3 px-6 py-3.5 transition-colors duration-150 ${isActive ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                                            >
+                                                {Icon && <Icon size={20} style={{ color: item.color.main }} strokeWidth={2} />}
+                                                <span className={`font-semibold ${isActive ? 'text-gray-900' : 'text-gray-700'}`}>
+                                                    {item.label}
+                                                </span>
+                                            </a>
+                                        );
+                                    }
+
+                                    return (
+                                        <div key={item.id} className="border-b border-gray-100">
+                                            <button
+                                                onClick={() => toggleSection(item.id)}
+                                                className="w-full flex items-center justify-between gap-3 px-6 py-3.5 hover:bg-gray-50 transition-colors duration-150"
+                                            >
+                                                <div className="flex items-center gap-3">
+                                                    {Icon && <Icon size={20} style={{ color: item.color.main }} strokeWidth={2} />}
+                                                    <span className="font-semibold text-gray-700 text-left">{item.label}</span>
+                                                </div>
+                                                <ChevronDown
+                                                    size={16}
+                                                    className={`text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                                />
+                                            </button>
+
+                                            <div
+                                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
+                                            >
+                                                <div className="bg-gray-50/50 py-2">
+                                                    {item.sections?.map((section) => {
+                                                        const SectionIcon = section.icon;
+                                                        return (
+                                                            <div key={section.id} className="mb-4 last:mb-0">
+                                                                <div className="flex items-center gap-2 px-6 py-2">
+                                                                    {SectionIcon && (
+                                                                        <SectionIcon size={14} style={{ color: item.color.main }} strokeWidth={2.5} />
+                                                                    )}
+                                                                    <h4 className="text-xs font-bold uppercase tracking-wide" style={{ color: item.color.main }}>
+                                                                        {section.title}
+                                                                    </h4>
+                                                                </div>
+
+                                                                <div className="space-y-0.5 mt-1">
+                                                                    {section.items.map((menuItem) => {
+                                                                        const ItemIcon = menuItem.icon;
+                                                                        const isItemActive = currentPath === menuItem.href;
+                                                                        return (
+                                                                            <a
+                                                                                key={menuItem.href}
+                                                                                href={menuItem.href}
+                                                                                onClick={onClose}
+                                                                                className={`flex items-start gap-3 px-6 py-2.5 pl-12 transition-colors duration-150 ${isItemActive ? 'bg-white' : 'hover:bg-white/70'}`}
+                                                                            >
+                                                                                {ItemIcon && (
+                                                                                    <div className="mt-0.5">
+                                                                                        <ItemIcon size={16} style={{ color: item.color.main }} strokeWidth={2} />
+                                                                                    </div>
+                                                                                )}
+                                                                                <div className="flex-1 min-w-0">
+                                                                                    <h5 className={`text-sm font-medium ${isItemActive ? 'text-gray-900' : 'text-gray-700'}`}>
+                                                                                        {menuItem.title}
+                                                                                    </h5>
+                                                                                    {menuItem.description && (
+                                                                                        <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{menuItem.description}</p>
+                                                                                    )}
+                                                                                </div>
+                                                                            </a>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </nav>
+                        </div>
+                    </div>
+                </>
+            );
+        };
+
+        // Header Component
+        const Header = ({ currentPath = '/', logoUrl = 'https://via.placeholder.com/150x150/0F766E/FFFFFF?text=IKA', siteName = 'IKA UNIMED' }) => {
+            const [openMegaMenu, setOpenMegaMenu] = useState(null);
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [isScrolled, setIsScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setIsScrolled(window.scrollY > 10);
+                };
+
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            useEffect(() => {
+                setOpenMegaMenu(null);
+            }, [currentPath]);
+
+            useEffect(() => {
+                setMobileMenuOpen(false);
+            }, [currentPath]);
+
+            useEffect(() => {
+                if (mobileMenuOpen) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+                return () => {
+                    document.body.style.overflow = '';
+                };
+            }, [mobileMenuOpen]);
+
+            const handleMenuHover = (menuId) => {
+                setOpenMegaMenu(menuId);
+            };
+
+            const handleMenuLeave = () => {
+                setOpenMegaMenu(null);
+            };
+
+            return (
+                <>
+                    <header className={`sticky top-0 z-40 w-full bg-white transition-all duration-300 ${isScrolled ? 'shadow-md' : 'shadow-sm border-b border-gray-100'}`}>
+                        <div className="max-w-7xl mx-auto">
+                            <div className="flex items-center justify-between h-20 px-6">
+                                {/* Logo */}
+                                <a href="/" className="flex items-center gap-3 group">
+                                    <div className="relative">
+                                        <img
+                                            src={logoUrl}
+                                            alt={siteName}
+                                            className="h-12 w-auto transition-transform duration-200 group-hover:scale-105"
+                                        />
+                                    </div>
+                                    <div className="hidden md:block">
+                                        <h1 className="text-xl font-bold text-gray-900 leading-tight">{siteName}</h1>
+                                        <p className="text-xs text-gray-600">Ikatan Alumni UNIMED</p>
+                                    </div>
+                                </a>
+
+                                {/* Desktop Navigation */}
+                                <nav className="hidden lg:block">
+                                    <ul className="flex items-center gap-1">
+                                        {menuConfig.map((item) => {
+                                            const Icon = item.icon;
+                                            const isActive = currentPath === item.href;
+                                            const hasSubMenu = item.sections && item.sections.length > 0;
+
+                                            return (
+                                                <li
+                                                    key={item.id}
+                                                    className="relative"
+                                                    onMouseEnter={() => hasSubMenu && handleMenuHover(item.id)}
+                                                    onMouseLeave={handleMenuLeave}
+                                                >
+                                                    {item.href ? (
+                                                        <a
+                                                            href={item.href}
+                                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-150 ${isActive ? 'text-white' : 'text-gray-700 hover:text-gray-900'} ${isActive ? item.color.hover.replace('hover:', '') : item.color.hover}`}
+                                                            style={isActive ? { backgroundColor: item.color.main } : undefined}
+                                                        >
+                                                            {Icon && <Icon size={16} strokeWidth={2} />}
+                                                            {item.label}
+                                                        </a>
+                                                    ) : (
+                                                        <button
+                                                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-150 ${openMegaMenu === item.id ? 'text-gray-900' : 'text-gray-700 hover:text-gray-900'} ${openMegaMenu === item.id ? item.color.hover.replace('hover:', '') : item.color.hover}`}
+                                                        >
+                                                            {Icon && <Icon size={16} className={`transition-transform duration-200 ${openMegaMenu === item.id ? 'scale-110' : ''}`} strokeWidth={2} />}
+                                                            {item.label}
+                                                        </button>
+                                                    )}
+
+                                                    {hasSubMenu && (
+                                                        <MegaMenu
+                                                            item={item}
+                                                            isOpen={openMegaMenu === item.id}
+                                                            onClose={handleMenuLeave}
+                                                        />
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </nav>
+
+                                {/* Mobile Menu Button */}
+                                <button
+                                    onClick={() => setMobileMenuOpen(true)}
+                                    className="lg:hidden p-2.5 rounded-lg hover:bg-gray-100 transition-colors"
+                                >
+                                    <Menu size={24} className="text-gray-700" strokeWidth={2} />
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <MobileMenu
+                        isOpen={mobileMenuOpen}
+                        onClose={() => setMobileMenuOpen(false)}
+                        menuItems={menuConfig}
+                        currentPath={currentPath}
+                    />
+                </>
+            );
+        };
+
+        // Demo Content
+        const DemoContent = () => {
+            return (
+                <div className="max-w-7xl mx-auto px-6 py-12">
+                    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                            Selamat Datang di Portal IKA UNIMED
+                        </h2>
+                        <p className="text-gray-600 leading-relaxed mb-6">
+                            Sistem navigasi ini dirancang dengan pendekatan enterprise-grade yang profesional, scalable, dan mudah dimaintain. 
+                            Berikut adalah fitur-fitur utama yang telah diimplementasikan:
+                        </p>
+                        
+                        <div className="grid md:grid-cols-2 gap-6 mt-8">
+                            <div className="border border-gray-200 rounded-xl p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+                                        <span className="text-teal-700 font-bold">1</span>
+                                    </div>
+                                    Mega Menu Desktop
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Navigasi dropdown yang luas dengan grid 2 kolom, header bergradient, dan hover effects yang halus.
+                                </p>
+                            </div>
+
+                            <div className="border border-gray-200 rounded-xl p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+                                        <span className="text-green-700 font-bold">2</span>
+                                    </div>
+                                    Accordion Mobile
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Menu mobile dengan accordion navigation yang hanya membuka satu section dalam satu waktu.
+                                </p>
+                            </div>
+
+                            <div className="border border-gray-200 rounded-xl p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
+                                        <span className="text-yellow-700 font-bold">3</span>
+                                    </div>
+                                    Sistem Warna Konsisten
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Palet warna teal, green, yellow, dan dark green tanpa orange, sesuai branding IKA UNIMED.
+                                </p>
+                            </div>
+
+                            <div className="border border-gray-200 rounded-xl p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                        <span className="text-slate-700 font-bold">4</span>
+                                    </div>
+                                    Sticky Header
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Header yang tetap di atas saat scroll dengan shadow effect yang dinamis.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sample Cards */}
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+                                <div className="w-full h-40 bg-gradient-to-br from-teal-50 to-green-50 rounded-lg mb-4"></div>
+                                <h3 className="font-semibold text-gray-900 mb-2">Konten Card {i}</h3>
+                                <p className="text-sm text-gray-600">
+                                    Scroll halaman ini untuk melihat efek sticky header. Resize browser untuk melihat responsive behavior.
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // App Component
+        const App = () => {
+            return (
+                <div>
+                    <Header currentPath="/" />
+                    <DemoContent />
+                </div>
+            );
+        };
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

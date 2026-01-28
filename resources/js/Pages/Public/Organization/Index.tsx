@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import TopBar from '@/Components/TopBar';
-import Header from '@/Components/Header';
+import { HeaderEnterprise as Header } from '@/components/navigation/HeaderEnterprise';
 import Footer from '@/Components/Footer';
 import { Card, CardContent, CardFooter, CardHeader } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';

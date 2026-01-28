@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { formatNumber } from '@/lib/utils';
 
 interface NewsCardProps {
   id: number;
@@ -102,7 +103,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
           
           {/* View count badge */}
           <div className="absolute top-3 right-3 bg-black/60 text-white px-2 py-1 rounded text-xs font-medium z-10">
-            👁️ {view_count.toLocaleString()}
+            👁️ {formatNumber(view_count)}
           </div>
         </div>
 

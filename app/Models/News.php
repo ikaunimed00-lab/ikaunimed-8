@@ -19,8 +19,10 @@ class News extends Model
         'content',
         'slug',
         'image',
+        'video_urls',
         'status',
-        'scope_type',
+        'type',
+        'scope_level',
         'organization_id',
         'published_at',
         'view_count',
@@ -34,6 +36,7 @@ class News extends Model
     {
         return [
             'published_at' => 'datetime',
+            'video_urls' => 'array',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
@@ -69,15 +72,23 @@ class News extends Model
      */
     public function scopeOrganization($query, $orgId)
     {
-        return $query->where('scope_type', 'internal')->where('organization_id', $orgId);
+        return $query->where('type', 'organization')->where('organization_id', $orgId);
     }
 
     /**
-     * Scope: berita publik (tidak terikat organisasi atau scope_type=public)
+     * Scope: berita publik (tidak terikat organisasi atau type=public)
      */
     public function scopePublicScope($query)
     {
-        return $query->where('scope_type', 'public');
+        return $query->where('type', 'public');
+    }
+
+    /**
+     * Scope: berita yang memiliki media (foto atau video)
+     */
+    public function scopeHasMedia($query)
+    {
+        return $query->whereNotNull('image')->orWhereNotNull('video_urls');
     }
 
     /**

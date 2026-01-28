@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import TopBar from '@/Components/TopBar';
-import Header from '@/Components/Header';
+import { HeaderEnterprise as Header } from '@/components/navigation/HeaderEnterprise';
 import Footer from '@/Components/Footer';
 import NewsCard from '@/Components/NewsCard';
 import { Badge } from '@/Components/ui/badge';

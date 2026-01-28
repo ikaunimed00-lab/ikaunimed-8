@@ -14,7 +14,6 @@ use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\Settings\ProfileController;
 
 use App\Http\Controllers\Info\PageController;
-use App\Http\Controllers\MediaController;
 
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\LegalizationAdminController;
@@ -44,6 +43,12 @@ use App\Http\Controllers\PublicOrganizationController;
 Route::get('/', fn () => Inertia::render('Index'))->name('home');
 
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+
+// Organization News Routes (Must be before news.show to avoid slug conflict)
+Route::get('/news/organisasi/{scope}/{slug?}', [NewsController::class, 'organization'])
+    ->where('scope', 'pp|dpw|dpc')
+    ->name('news.organization');
+
 Route::get('/news/{news:slug}', [NewsController::class, 'show'])->name('news.show');
 Route::get('/api/news/trending', [NewsController::class, 'trending'])->name('news.trending');
 
@@ -64,8 +69,8 @@ Route::get('/syarat-ketentuan', [PageController::class, 'terms'])->name('info.te
 Route::get('/kebijakan-privasi', [PageController::class, 'privacy'])->name('info.privacy');
 Route::get('/hubungi-kami', [PageController::class, 'contact'])->name('info.contact');
 
-Route::get('/media/foto', [MediaController::class, 'photos'])->name('media.photos');
-Route::get('/media/video', [MediaController::class, 'videos'])->name('media.videos');
+Route::get('/media/foto', [NewsController::class, 'mediaPhotos'])->name('media.photos');
+Route::get('/media/video', [NewsController::class, 'mediaVideos'])->name('media.videos');
 
 /*
 |--------------------------------------------------------------------------

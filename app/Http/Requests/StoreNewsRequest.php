@@ -49,6 +49,8 @@ class StoreNewsRequest extends FormRequest
             ],
             'categories.*' => 'required|integer|exists:categories,id',
             'organization_id' => 'nullable|exists:organizations,id',
+            'video_urls' => 'nullable|array',
+            'video_urls.*' => 'required|url',
             'published_at' => 'nullable|date_format:Y-m-d\TH:i',
             'status' => 'required|in:draft,scheduled,published',
         ];

@@ -1,11 +1,12 @@
 import TopBar from '@/components/TopBar';
-import Header from '@/components/Header';
+import { HeaderEnterprise as Header } from '@/components/navigation/HeaderEnterprise';
 import Footer from '@/components/Footer';
 import NewsCard from '@/components/NewsCard';
 import NewsLayout from '@/components/NewsLayout';
 import AdInline from '@/components/AdInline';
 import AdSidebar from '@/components/AdSidebar';
 import { Head, Link } from '@inertiajs/react';
+import { formatNumber } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 interface NewsItem {
@@ -169,7 +170,7 @@ export default function NewsShow({
               </div>
               <div className="flex items-center gap-1">
                 <span>👁️</span>
-                <span>{news.view_count.toLocaleString()} pembaca</span>
+                <span>{formatNumber(news.view_count)} pembaca</span>
               </div>
             </div>
 
@@ -222,6 +223,72 @@ export default function NewsShow({
                 });
               })()}
             </div>
+
+            {/* Video Gallery Section */}
+            {news.video_urls && news.video_urls.length > 0 && (
+              <div className="mb-12">
+                <h3 className="text-2xl font-bold text-[#0F172A] mb-6 flex items-center gap-2">
+                  <span className="text-3xl">🎥</span> Galeri Video
+                </h3>
+                <div className={`grid grid-cols-1 ${news.video_urls.length > 1 ? 'md:grid-cols-2' : ''} gap-6`}>
+              {news.video_urls.map((url, index) => {
+                let embedUrl = null;
+                let isTikTok = false;
+                let isShorts = false;
+
+                // Helper to extract YouTube ID
+                const getYoutubeId = (url: string) => {
+                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+                    const match = url.match(regExp);
+                    return (match && match[2].length === 11) ? match[2] : null;
+                };
+
+                const youtubeId = getYoutubeId(url);
+                if (youtubeId) {
+                    embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+                    if (url.includes('shorts/')) {
+                        isShorts = true;
+                    }
+                }
+                // TikTok
+                else if (url.includes('tiktok.com')) {
+                    isTikTok = true;
+                    // TikTok embed usually requires the video ID
+                    const match = url.match(/video\/(\d+)/);
+                    if (match && match[1]) {
+                        embedUrl = `https://www.tiktok.com/embed/v2/${match[1]}`;
+                    }
+                }
+
+                const isVertical = isTikTok || isShorts;
+
+                if (!embedUrl) {
+                    // Fallback for unknown video types or parsing failures
+                    return (
+                         <div key={index} className="aspect-video bg-gray-100 rounded-xl overflow-hidden shadow-lg flex items-center justify-center border border-gray-200">
+                            <a href={url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 text-gray-500 hover:text-[#0F766E] transition-colors">
+                                <span className="text-3xl">🔗</span>
+                                <span className="font-medium">Tonton Video</span>
+                            </a>
+                         </div>
+                    );
+                }
+
+                return (
+                  <div key={index} className={`bg-black rounded-xl overflow-hidden shadow-lg ${isVertical ? 'aspect-[9/16] max-w-[350px] mx-auto w-full' : 'aspect-video w-full'}`}>
+                    <iframe
+                      src={embedUrl}
+                      title={`Video ${index + 1}`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                );
+              })}
+            </div>
+              </div>
+            )}
 
             {/* Share Section */}
 <div className="bg-[#F8FAF9] border border-[#E6EAE8] rounded-lg p-5 mb-8">

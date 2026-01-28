@@ -14,6 +14,7 @@ export default function Create({ authors, categories }: any) {
         content: "",
         image: null as File | null,
         categories: [] as number[],
+        video_urls: [] as string[],
         status: "draft",
         published_at: "",
     });
@@ -125,6 +126,46 @@ export default function Create({ authors, categories }: any) {
                                 <p className="text-xs text-slate-500">
                                     Minimal 20 • Maksimal 500 karakter
                                 </p>
+                            </div>
+
+                            {/* GAMBAR */}
+                            <div className="bg-white rounded-xl shadow p-6 space-y-4">
+                                <label className="block font-semibold text-slate-900">
+                                    🎥 Video (YouTube / TikTok)
+                                </label>
+                                <div className="space-y-3">
+                                    {data.video_urls.map((url: string, index: number) => (
+                                        <div key={index} className="flex gap-2">
+                                            <input
+                                                value={url}
+                                                onChange={(e) => {
+                                                    const newUrls = [...data.video_urls];
+                                                    newUrls[index] = e.target.value;
+                                                    setData("video_urls", newUrls);
+                                                }}
+                                                placeholder="https://www.youtube.com/watch?v=..."
+                                                className="flex-1 border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newUrls = data.video_urls.filter((_: string, i: number) => i !== index);
+                                                    setData("video_urls", newUrls);
+                                                }}
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                                            >
+                                                <X className="h-5 w-5" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setData("video_urls", [...data.video_urls, ""])}
+                                        className="text-sm text-blue-600 font-semibold hover:text-blue-700 flex items-center gap-1"
+                                    >
+                                        + Tambah Link Video
+                                    </button>
+                                </div>
                             </div>
 
                             {/* GAMBAR */}

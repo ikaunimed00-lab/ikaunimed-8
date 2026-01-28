@@ -1,6 +1,6 @@
 import { Head } from "@inertiajs/react";
 import TopBar from "@/components/TopBar";
-import Header from "@/components/Header";
+import { HeaderEnterprise as Header } from '@/components/navigation/HeaderEnterprise';
 import HeroCarousel from "@/components/HeroCarousel";
 import CTACards from "@/components/CTACards";
 import VideoSection from "@/components/VideoSection";

@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import React from 'react';
 import TopBar from '@/components/TopBar';
-import Header from '@/components/Header';
+import { HeaderEnterprise as Header } from '@/components/navigation/HeaderEnterprise';
 import Footer from '@/components/Footer';
 import NewsCard from '@/components/NewsCard';
 import CategoryNavigation from '@/components/CategoryNavigation';

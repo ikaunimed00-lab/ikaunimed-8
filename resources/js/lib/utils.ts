@@ -16,3 +16,11 @@ export function isSameUrl(
 export function resolveUrl(url: NonNullable<InertiaLinkProps['href']>): string {
     return typeof url === 'string' ? url : url.url;
 }
+
+export function formatNumber(value: number | string | null | undefined): string {
+    const num = Number(value);
+    if (isNaN(num) || value === null || value === undefined) {
+        return '0';
+    }
+    return num.toLocaleString('id-ID');
+}

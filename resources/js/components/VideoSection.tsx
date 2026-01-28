@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@inertiajs/react';
 
 const VideoSection = () => {
   return (
@@ -38,15 +39,15 @@ const VideoSection = () => {
           </div>
 
           {/* Sisi Video */}
-          <div className="order-2 lg:order-1 relative w-full rounded-3xl overflow-hidden shadow-2xl aspect-video bg-first-dark-green">
+          <Link href="/media/video" className="order-2 lg:order-1 relative w-full rounded-3xl overflow-hidden shadow-2xl aspect-video bg-first-dark-green block group cursor-pointer">
             {/* Overlay Placeholder Video */}
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-first-dark-green via-second-dark-green to-first-dark-green/90">
               <div className="text-center">
-                {/* Tombol Play: Menggunakan Kuning IKA agar kontras dengan background hijau */}
-                <div className="w-20 h-20 bg-ika-yellow rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform cursor-pointer shadow-lg group">
-                  <span className="text-3xl ml-1 text-first-dark-green group-hover:scale-110 transition-transform">▶</span>
+                {/* Icon Video Statis (Bukan Tombol Play) */}
+                <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm border border-white/20">
+                  <span className="text-3xl ml-1 text-white opacity-80">🎬</span>
                 </div>
-                <p className="text-white font-medium tracking-wide opacity-90">Saksikan Profil IKA UNIMED</p>
+                <p className="text-white font-medium tracking-wide opacity-90 group-hover:text-ika-yellow transition-colors">Lihat Galeri Video</p>
               </div>
             </div>
             
@@ -66,7 +67,7 @@ const VideoSection = () => {
                 <p className="text-white/70 text-[10px] uppercase tracking-tighter">The Character Building University</p>
               </div>
             </div>
-          </div>
+          </Link>
 
         </div>
       </div>

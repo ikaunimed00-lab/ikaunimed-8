@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import { formatNumber } from '@/lib/utils';
 
 /* =========================
    TYPES
@@ -52,7 +53,7 @@ const NewsItemSmall: React.FC<NewsItem> = ({ title, slug, image, view_count }) =
         {view_count && (
           <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
             <span>👁️</span>
-            <span>{view_count.toLocaleString()}</span>
+            <span>{formatNumber(view_count)}</span>
           </p>
         )}
       </div>

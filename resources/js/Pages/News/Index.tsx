@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import React from 'react';
 import TopBar from '@/components/TopBar';
-import Header from '@/components/Header';
+import { HeaderEnterprise as Header } from '@/components/navigation/HeaderEnterprise';
 import Footer from '@/components/Footer';
 import HeroNews from '@/components/HeroNews';
 import NewsCard from '@/components/NewsCard';
@@ -35,6 +35,16 @@ interface PaginationLink {
   active: boolean;
 }
 
+interface VideoItem {
+  id: number;
+  title: string;
+  slug: string;
+  video_urls: string[];
+  view_count?: number;
+  published_at: string;
+  image?: string | null;
+}
+
 interface NewsIndexProps {
   news: {
     data: NewsItem[];
@@ -42,9 +52,11 @@ interface NewsIndexProps {
     last_page: number;
     links: PaginationLink[];
   };
+  latestVideos?: VideoItem[];
+  popularVideos?: VideoItem[];
 }
 
-const NewsIndex = ({ news }: NewsIndexProps) => {
+const NewsIndex = ({ news, latestVideos = [], popularVideos = [] }: NewsIndexProps) => {
   const featured = news.data[0];
   const restNews = news.data.slice(1);
 
@@ -171,7 +183,7 @@ const NewsIndex = ({ news }: NewsIndexProps) => {
                   <div className="space-y-8">
                     {/* 1. FlashContent */}
                     <div className="bg-white rounded-lg border border-[#E6EAE8] overflow-hidden">
-                      <FlashContent />
+                      <FlashContent videos={latestVideos} />
                     </div>
 
                     {/* 2. Berita Utama / News Feed */}
@@ -198,7 +210,7 @@ const NewsIndex = ({ news }: NewsIndexProps) => {
 
                     {/* 4. VideoPopular */}
                     <div className="bg-white rounded-lg border border-[#E6EAE8] p-6">
-                      <VideoPopular />
+                      <VideoPopular videos={popularVideos} />
                     </div>
 
                     {/* 5. KolumOpini */}
